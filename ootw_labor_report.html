@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOTW — Labor Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+  .top { background: #1a1a1a; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .top h1 { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+  .top span { font-size: 12px; color: #888; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  .card { background: #fff; border-radius: 10px; border: 1px solid #e8e8e6; overflow: hidden; margin-bottom: 20px; }
+  .card-head { padding: 14px 20px; border-bottom: 1px solid #e8e8e6; display: flex; align-items: center; justify-content: space-between; }
+  .card-head h2 { font-size: 13px; font-weight: 500; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
+  .setup { padding: 24px; }
+  .setup label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+  .setup input { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: monospace; margin-bottom: 12px; }
+  .setup input:focus { outline: none; border-color: #1a1a1a; }
+  .btn { padding: 8px 18px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; }
+  .btn-primary { background: #1a1a1a; color: #fff; }
+  .btn-primary:hover { background: #333; }
+  .btn-secondary { background: #f0f0ee; color: #1a1a1a; border: 1px solid #ddd; }
+  .btn-secondary:hover { background: #e8e8e6; }
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .status { font-size: 12px; color: #888; }
+  .status.error { color: #dc3545; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 10px 12px; text-align: right; font-weight: 500; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e8e8e6; background: #fafaf8; }
+  thead th:first-child { text-align: left; }
+  td { padding: 10px 12px; text-align: right; border-bottom: 1px solid #f0f0ee; }
+  td:first-child { text-align: left; font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafaf8; }
+  .over { color: #c0392b; font-weight: 600; }
+  .ok { color: #27ae60; }
+  .neutral { color: #888; }
+  .badge { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 99px; margin-left: 6px; vertical-align: middle; }
+  .badge-over { background: #fde8e8; color: #c0392b; }
+  .badge-ok { background: #e8f8ee; color: #27ae60; }
+  .totals-row td { font-weight: 600; background: #f5f5f3; border-top: 2px solid #e8e8e6; border-bottom: none; }
+  .group-label { font-size: 11px; color: #999; font-weight: 400; margin-left: 6px; }
+  .empty { padding: 40px; text-align: center; color: #999; font-size: 13px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 20px; }
+  .stat { }
+  .stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 500; }
+  .stat-value.over { color: #c0392b; }
+  .stat-value.ok { color: #27ae60; }
+  .loading { padding: 40px; text-align: center; color: #888; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Out of the Woods — Labor Report</h1>
+  <span id="last-updated"></span>
+</div>
+
+<div class="container">
+
+  <div id="report-area" >
+    <div class="card">
+      <div class="card-head">
+        <h2>Summary — In Production Jobs</h2>
+        <div class="controls">
+          <button class="btn btn-secondary" onclick="loadReport()">↻ Refresh</button>
+          <span class="status" id="report-status"></span>
+        </div>
+      </div>
+      <div class="summary-grid" id="summary"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Budgeted vs Actual Labor by Job</h2></div>
+      <div id="table-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ORG_ID = '22PEnmupQzLy';
+const STATUS_CF = '22PEnmvm85Ad';
+const LABOR_TYPE_ID = '22PEnmvkyEJ2';
+const LC_IDS = new Set(['22PKqY8AD7gA','22PHbqmsSWV3','22PLzQjq9Lnm','22PXzZvkvr8v']);
+const STAFF_IDS = new Set(['22PWrLmyK4z3']);
+const APP_IDS = new Set(['22PRPkkDd3WX']);
+
+let GRANT_KEY = '22TSP4tXi4XtJCf3kydhJhLCjXytzHFeBm';
+
+function getUserType(id) {
+  if (LC_IDS.has(id)) return 'LC';
+  if (STAFF_IDS.has(id)) return 'Staff';
+  if (APP_IDS.has(id)) return 'Apprentice';
+  return 'Other';
+}
+
+function getNameType(name) {
+  const n = name.toLowerCase();
+  if (n.includes('- lc') || n.includes('lead carp') || n.includes('lead carpenter')) return 'LC';
+  if (n.includes('staff')) return 'Staff';
+  if (n.includes('apprentice') || n.includes('laborer') || n.includes('- laborer')) return 'Apprentice';
+  return 'Other';
+}
+
+function fmt(n) {
+  return '$' + Math.round(n || 0).toLocaleString();
+}
+
+function pct(actual, budget) {
+  if (!budget) return null;
+  return Math.round((actual / budget) * 100);
+}
+
+async function query(q) {
+  const res = await fetch('https://api.jobtread.com/pave', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GRANT_KEY}` },
+    body: JSON.stringify({ query: q })
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function loadReport() {
+  document.getElementById('report-status').textContent = 'Loading...';
+  document.getElementById('report-status').className = 'status';
+  document.getElementById('setup-status').textContent = '✓ Connected';
+  document.getElementById('table-area').innerHTML = '<div class="loading"><span class="spinner"></span>Fetching jobs...</div>';
+  document.getElementById('summary').innerHTML = '';
+
+  try {
+    // Step 1: Get all open jobs with Status = In Production
+    const jobsRes = await query({
+      organization: {
+        $: { id: ORG_ID },
+        jobs: {
+          $: { size: 50, where: { '=': [{ field: ['closedOn'] }, { value: null }] } },
+          nodes: {
+            id: {}, name: {},
+            customFieldValues: { $: { size: 5 }, nodes: { customField: { id: {} }, value: {} } }
+          }
+        }
+      }
+    });
+
+    const allJobs = jobsRes.organization.jobs.nodes;
+    const inProdJobs = allJobs.filter(j => {
+      const cfv = j.customFieldValues?.nodes || [];
+      return cfv.some(c => c.customField?.id === STATUS_CF && c.value === 'In Production');
+    });
+
+    if (!inProdJobs.length) {
+      document.getElementById('table-area').innerHTML = '<div class="empty">No In Production jobs found</div>';
+      return;
+    }
+
+    document.getElementById('table-area').innerHTML = `<div class="loading"><span class="spinner"></span>Fetching labor data for ${inProdJobs.length} jobs...</div>`;
+
+    // Step 2: For each job, fetch budgeted labor cost items and ALL time entries (paginated)
+    const jobData = [];
+    for (const job of inProdJobs) {
+      document.getElementById('table-area').innerHTML = `<div class="loading"><span class="spinner"></span>Loading ${job.name}...</div>`;
+
+      const budgeted = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
+      const actual = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
+
+      // Fetch budgeted labor cost items (paginated)
+      let ciPage = null;
+      do {
+        const ciRes = await query({
+          job: {
+            $: { id: job.id },
+            costItems: {
+              $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: { and: [
+                { '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }] },
+                { '=': [{ field: ['jobCostItem', 'id'] }, { value: null }] }
+              ]}},
+              nextPage: {},
+              nodes: { cost: {}, name: {} }
+            }
+          }
+        });
+        (ciRes.job.costItems?.nodes || []).forEach(ci => {
+          const t = getNameType(ci.name);
+          budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
+        });
+        ciPage = ciRes.job.costItems?.nextPage || null;
+      } while (ciPage);
+
+      // Fetch ALL time entries (paginated)
+      let tePage = null;
+      do {
+        const teRes = await query({
+          job: {
+            $: { id: job.id },
+            timeEntries: {
+              $: { size: 100, ...(tePage ? { page: tePage } : {}) },
+              nextPage: {},
+              nodes: { cost: {}, user: { id: {} } }
+            }
+          }
+        });
+        (teRes.job.timeEntries?.nodes || []).forEach(te => {
+          const t = getUserType(te.user?.id);
+          actual[t] = (actual[t] || 0) + (te.cost || 0);
+        });
+        tePage = teRes.job.timeEntries?.nextPage || null;
+      } while (tePage);
+
+      jobData.push({ name: job.name, budgeted, actual });
+    }
+
+    renderReport(jobData);
+    const now = new Date();
+    document.getElementById('last-updated').textContent = `Updated ${now.toLocaleTimeString()}`;
+    document.getElementById('report-status').textContent = `${jobData.length} jobs loaded`;
+
+  } catch(err) {
+    document.getElementById('report-status').textContent = `Error: ${err.message}`;
+    document.getElementById('report-status').className = 'status error';
+    document.getElementById('table-area').innerHTML = `<div class="empty">Failed to load: ${err.message}<br><small>Check your grant key and try again</small></div>`;
+  }
+}
+
+function renderReport(jobs) {
+  const types = ['LC', 'Staff', 'Apprentice'];
+  const totB = { LC:0, Staff:0, Apprentice:0 };
+  const totA = { LC:0, Staff:0, Apprentice:0 };
+
+  jobs.forEach(j => {
+    types.forEach(t => {
+      totB[t] += j.budgeted[t] || 0;
+      totA[t] += j.actual[t] || 0;
+    });
+  });
+
+  const grandB = totB.LC + totB.Staff + totB.Apprentice;
+  const grandA = totA.LC + totA.Staff + totA.Apprentice;
+  const grandPct = pct(grandA, grandB);
+
+  // Summary cards
+  document.getElementById('summary').innerHTML = `
+    <div class="stat">
+      <div class="stat-label">Total Budgeted</div>
+      <div class="stat-value">${fmt(grandB)}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Actual</div>
+      <div class="stat-value ${grandA > grandB ? 'over' : 'ok'}">${fmt(grandA)}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Variance</div>
+      <div class="stat-value ${grandA > grandB ? 'over' : 'ok'}">${grandA > grandB ? '+' : ''}${fmt(grandA - grandB)}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Burn Rate</div>
+      <div class="stat-value ${grandPct > 100 ? 'over' : grandPct > 85 ? 'neutral' : 'ok'}">${grandPct !== null ? grandPct + '%' : '—'}</div>
+    </div>
+  `;
+
+  // Table
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>Job</th>
+        <th>LC Budget</th><th>LC Actual</th>
+        <th>Staff Budget</th><th>Staff Actual</th>
+        <th>App. Budget</th><th>App. Actual</th>
+        <th>Total Budget</th><th>Total Actual</th><th>%</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  jobs.forEach(job => {
+    const b = job.budgeted;
+    const a = job.actual;
+    const totalB = b.LC + b.Staff + b.Apprentice;
+    const totalA = a.LC + a.Staff + a.Apprentice;
+    const p = pct(totalA, totalB);
+    const isOver = totalA > totalB * 1.05;
+    const badge = totalB > 0 ? `<span class="badge ${isOver ? 'badge-over' : 'badge-ok'}">${isOver ? '▲ over' : '✓ ok'}</span>` : '';
+
+    html += `<tr>
+      <td>${job.name}${badge}</td>
+      <td class="neutral">${b.LC ? fmt(b.LC) : '—'}</td>
+      <td class="${a.LC > b.LC * 1.05 ? 'over' : a.LC > 0 ? 'ok' : 'neutral'}">${a.LC ? fmt(a.LC) : '—'}</td>
+      <td class="neutral">${b.Staff ? fmt(b.Staff) : '—'}</td>
+      <td class="${a.Staff > b.Staff * 1.05 ? 'over' : a.Staff > 0 ? 'ok' : 'neutral'}">${a.Staff ? fmt(a.Staff) : '—'}</td>
+      <td class="neutral">${b.Apprentice ? fmt(b.Apprentice) : '—'}</td>
+      <td class="${a.Apprentice > b.Apprentice * 1.05 ? 'over' : a.Apprentice > 0 ? 'ok' : 'neutral'}">${a.Apprentice ? fmt(a.Apprentice) : '—'}</td>
+      <td class="neutral">${fmt(totalB)}</td>
+      <td class="${isOver ? 'over' : 'ok'}">${fmt(totalA)}</td>
+      <td class="${p > 100 ? 'over' : p > 85 ? 'neutral' : 'ok'}">${p !== null ? p + '%' : '—'}</td>
+    </tr>`;
+  });
+
+  html += `</tbody>
+    <tfoot>
+      <tr class="totals-row">
+        <td>Total</td>
+        <td>${fmt(totB.LC)}</td><td class="${totA.LC > totB.LC*1.05 ? 'over':'ok'}">${fmt(totA.LC)}</td>
+        <td>${fmt(totB.Staff)}</td><td class="${totA.Staff > totB.Staff*1.05 ? 'over':'ok'}">${fmt(totA.Staff)}</td>
+        <td>${fmt(totB.Apprentice)}</td><td class="${totA.Apprentice > totB.Apprentice*1.05 ? 'over':'ok'}">${fmt(totA.Apprentice)}</td>
+        <td>${fmt(grandB)}</td>
+        <td class="${grandA > grandB ? 'over':'ok'}">${fmt(grandA)}</td>
+        <td class="${grandPct > 100 ? 'over' : grandPct > 85 ? 'neutral' : 'ok'}">${grandPct !== null ? grandPct+'%' : '—'}</td>
+      </tr>
+    </tfoot>
+  </table>`;
+
+  document.getElementById('table-area').innerHTML = html;
+}
+window.addEventListener("DOMContentLoaded", loadReport);
+</script>
+</body>
+</html>
+
