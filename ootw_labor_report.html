@@ -170,28 +170,40 @@ async function loadReport() {
       const budgeted = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
       const actual = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
 
-      // Fetch budgeted labor cost items (paginated)
+      // Fetch ALL budgeted labor cost items (paginated) - all items regardless of parent/child
+      // Strategy: collect all items, then sum only leaf nodes (children) plus orphan parents
+      const allCostItems = [];
       let ciPage = null;
       do {
         const ciRes = await query({
           job: {
             $: { id: job.id },
             costItems: {
-              $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: { and: [
-                { '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }] },
-                { '=': [{ field: ['jobCostItem', 'id'] }, { value: null }] }
-              ]}},
+              $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: {
+                '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }]
+              }},
               nextPage: {},
-              nodes: { cost: {}, name: {} }
+              nodes: { cost: {}, name: {}, id: {}, jobCostItem: { id: {} } }
             }
           }
         });
-        (ciRes.job.costItems?.nodes || []).forEach(ci => {
-          const t = getNameType(ci.name);
-          budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
-        });
+        (ciRes.job.costItems?.nodes || []).forEach(ci => allCostItems.push(ci));
         ciPage = ciRes.job.costItems?.nextPage || null;
       } while (ciPage);
+
+      // Find parent IDs that have children
+      const parentIdsWithChildren = new Set(
+        allCostItems.filter(ci => ci.jobCostItem?.id).map(ci => ci.jobCostItem.id)
+      );
+      // Sum: children + orphan parents (parents with no children)
+      allCostItems.forEach(ci => {
+        const isChild = !!ci.jobCostItem?.id;
+        const isOrphanParent = !ci.jobCostItem?.id && !parentIdsWithChildren.has(ci.id);
+        if (isChild || isOrphanParent) {
+          const t = getNameType(ci.name);
+          budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
+        }
+      });
 
       // Fetch ALL time entries (paginated)
       let tePage = null;
