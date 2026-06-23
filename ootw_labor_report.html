@@ -35,6 +35,7 @@
   tr:hover td { background: #fafaf8; }
   .over { color: #c0392b; font-weight: 600; }
   .ok { color: #27ae60; }
+  .warn { color: #e67e22; font-weight: 600; }
   .neutral { color: #888; }
   .badge { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 99px; margin-left: 6px; vertical-align: middle; }
   .badge-over { background: #fde8e8; color: #c0392b; }
@@ -62,20 +63,15 @@
 
 <div class="container">
 
-  <div id="report-area" >
+  <div id="report-area">
     <div class="card">
       <div class="card-head">
-        <h2>Summary — In Production Jobs</h2>
+        <h2>Budgeted vs Actual Labor by Job — In Production</h2>
         <div class="controls">
           <button class="btn btn-secondary" onclick="loadReport()">↻ Refresh</button>
           <span class="status" id="report-status"></span>
         </div>
       </div>
-      <div class="summary-grid" id="summary"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><h2>Budgeted vs Actual Labor by Job</h2></div>
       <div id="table-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
     </div>
   </div>
@@ -114,6 +110,13 @@ function fmt(n) {
 function pct(actual, budget) {
   if (!budget) return null;
   return Math.round((actual / budget) * 100);
+}
+
+function pctClass(p) {
+  if (p === null) return 'neutral';
+  if (p <= 50) return 'ok';
+  if (p <= 85) return 'warn';
+  return 'over';
 }
 
 async function query(q) {
@@ -242,26 +245,6 @@ function renderReport(jobs) {
   const grandA = totA.LC + totA.Staff + totA.Apprentice;
   const grandPct = pct(grandA, grandB);
 
-  // Summary cards
-  document.getElementById('summary').innerHTML = `
-    <div class="stat">
-      <div class="stat-label">Total Budgeted</div>
-      <div class="stat-value">${fmt(grandB)}</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Total Actual</div>
-      <div class="stat-value ${grandA > grandB ? 'over' : 'ok'}">${fmt(grandA)}</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Variance</div>
-      <div class="stat-value ${grandA > grandB ? 'over' : 'ok'}">${grandA > grandB ? '+' : ''}${fmt(grandA - grandB)}</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Burn Rate</div>
-      <div class="stat-value ${grandPct > 100 ? 'over' : grandPct > 85 ? 'neutral' : 'ok'}">${grandPct !== null ? grandPct + '%' : '—'}</div>
-    </div>
-  `;
-
   // Table
   let html = `<table>
     <thead>
@@ -294,7 +277,7 @@ function renderReport(jobs) {
       <td class="${a.Apprentice > b.Apprentice * 1.05 ? 'over' : a.Apprentice > 0 ? 'ok' : 'neutral'}">${a.Apprentice ? fmt(a.Apprentice) : '—'}</td>
       <td class="neutral">${fmt(totalB)}</td>
       <td class="${isOver ? 'over' : 'ok'}">${fmt(totalA)}</td>
-      <td class="${p > 100 ? 'over' : p > 85 ? 'neutral' : 'ok'}">${p !== null ? p + '%' : '—'}</td>
+      <td class="${pctClass(p)}">${p !== null ? p + '%' : '—'}</td>
     </tr>`;
   });
 
@@ -307,7 +290,7 @@ function renderReport(jobs) {
         <td>${fmt(totB.Apprentice)}</td><td class="${totA.Apprentice > totB.Apprentice*1.05 ? 'over':'ok'}">${fmt(totA.Apprentice)}</td>
         <td>${fmt(grandB)}</td>
         <td class="${grandA > grandB ? 'over':'ok'}">${fmt(grandA)}</td>
-        <td class="${grandPct > 100 ? 'over' : grandPct > 85 ? 'neutral' : 'ok'}">${grandPct !== null ? grandPct+'%' : '—'}</td>
+        <td class="${pctClass(grandPct)}">${grandPct !== null ? grandPct+'%' : '—'}</td>
       </tr>
     </tfoot>
   </table>`;
