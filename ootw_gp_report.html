@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOTW — GP% Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+  .top { background: #1a1a1a; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .top h1 { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+  .top span { font-size: 12px; color: #888; }
+  .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .card { background: #fff; border-radius: 10px; border: 1px solid #e8e8e6; overflow: hidden; margin-bottom: 20px; }
+  .card-head { padding: 14px 20px; border-bottom: 1px solid #e8e8e6; display: flex; align-items: center; justify-content: space-between; }
+  .card-head h2 { font-size: 13px; font-weight: 500; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
+  .btn { padding: 8px 18px; font-size: 13px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; background: #f0f0ee; color: #1a1a1a; font-family: inherit; }
+  .btn:hover { background: #e8e8e6; }
+  .controls { display: flex; gap: 10px; align-items: center; }
+  .status { font-size: 12px; color: #888; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 10px 12px; text-align: right; font-weight: 500; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e8e8e6; background: #fafaf8; }
+  thead th:first-child { text-align: left; }
+  td { padding: 10px 12px; text-align: right; border-bottom: 1px solid #f0f0ee; }
+  td:first-child { text-align: left; font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafaf8; }
+  .over { color: #c0392b; font-weight: 600; }
+  .ok { color: #27ae60; }
+  .warn { color: #e67e22; font-weight: 600; }
+  .neutral { color: #888; }
+  .bar-cell { width: 120px; padding: 10px 12px; }
+  .bar-wrap { background: #f0f0ee; border-radius: 99px; height: 8px; width: 100%; overflow: hidden; }
+  .bar-fill { height: 8px; border-radius: 99px; }
+  .empty { padding: 40px; text-align: center; color: #999; font-size: 13px; }
+  .loading { padding: 40px; text-align: center; color: #888; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .divider { width: 1px; background: #e8e8e6; margin: 0 4px; height: 20px; display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Out of the Woods — GP% Report</h1>
+  <span id="last-updated"></span>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="card-head">
+      <h2>Gross Profit % by Job — In Production</h2>
+      <div class="controls">
+        <button class="btn" onclick="loadReport()">↻ Refresh</button>
+        <span class="status" id="report-status"></span>
+      </div>
+    </div>
+    <div id="table-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+  </div>
+</div>
+
+<script>
+const ORG_ID = '22PEnmupQzLy';
+const STATUS_CF = '22PEnmvm85Ad';
+const GRANT_KEY = '22TSP4tXi4XtJCf3kydhJhLCjXytzHFeBm';
+
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  return '$' + Math.round(n).toLocaleString();
+}
+
+function fmtPct(n) {
+  if (n === null || n === undefined) return '—';
+  return (Math.round(n * 10) / 10) + '%';
+}
+
+function varianceClass(variance) {
+  if (variance === null) return 'neutral';
+  if (variance >= -2) return 'ok';
+  if (variance >= -5) return 'warn';
+  return 'over';
+}
+
+function barColor(variance) {
+  if (variance === null) return '#ddd';
+  if (variance >= -2) return '#27ae60';
+  if (variance >= -5) return '#e67e22';
+  return '#c0392b';
+}
+
+async function query(q) {
+  const res = await fetch('https://api.jobtread.com/pave', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GRANT_KEY}` },
+    body: JSON.stringify({ query: q })
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function loadReport() {
+  document.getElementById('report-status').textContent = 'Loading...';
+  document.getElementById('table-area').innerHTML = '<div class="loading"><span class="spinner"></span>Fetching jobs...</div>';
+
+  try {
+    const res = await query({
+      organization: {
+        $: { id: ORG_ID },
+        jobs: {
+          $: { size: 50, where: { '=': [{ field: ['closedOn'] }, { value: null }] } },
+          nodes: {
+            id: {}, name: {},
+            location: { account: { name: {} } },
+            projectedPrice: {},
+            projectedCost: {},
+            actualCost: {},
+            customFieldValues: { $: { size: 5 }, nodes: { customField: { id: {} }, value: {} } }
+          }
+        }
+      }
+    });
+
+    const allJobs = res.organization.jobs.nodes;
+    const jobs = allJobs.filter(j => {
+      const cfv = j.customFieldValues?.nodes || [];
+      return cfv.some(c => c.customField?.id === STATUS_CF && c.value === 'In Production');
+    });
+
+    if (!jobs.length) {
+      document.getElementById('table-area').innerHTML = '<div class="empty">No In Production jobs found</div>';
+      return;
+    }
+
+    // For each In Production job, fetch budgeted cost and price from approved budget documents
+    for (const job of jobs) {
+      const orderRes = await query({
+        job: {
+          $: { id: job.id },
+          documents: {
+            $: { size: 20, where: { and: [
+              { '=': [{ field: ['type'] }, { value: 'customerOrder' }] },
+              { '=': [{ field: ['status'] }, { value: 'approved' }] },
+              { '=': [{ field: ['includeInBudget'] }, { value: true }] }
+            ]}},
+            nodes: { id: {}, cost: {}, price: {}, name: {} }
+          }
+        }
+      });
+      const orders = orderRes.job.documents?.nodes || [];
+      job.budgetedCostTotal = orders.reduce((sum, o) => sum + (o.cost || 0), 0);
+      job.budgetedPriceTotal = orders.reduce((sum, o) => sum + (o.price || 0), 0);
+    }
+
+    renderReport(jobs);
+    const now = new Date();
+    document.getElementById('last-updated').textContent = `Updated ${now.toLocaleTimeString()}`;
+    document.getElementById('report-status').textContent = `${jobs.length} jobs loaded`;
+
+  } catch(err) {
+    document.getElementById('report-status').textContent = `Error: ${err.message}`;
+    document.getElementById('table-area').innerHTML = `<div class="empty">Failed to load: ${err.message}</div>`;
+  }
+}
+
+function renderReport(jobs) {
+  // Sort by projected margin ascending (lowest margin first)
+  jobs.sort((a, b) => {
+    const mA = a.projectedPrice ? (a.projectedPrice - a.projectedCost) / a.projectedPrice * 100 : 999;
+    const mB = b.projectedPrice ? (b.projectedPrice - b.projectedCost) / b.projectedPrice * 100 : 999;
+    return mA - mB;
+  });
+
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>Job</th>
+        <th>Contract Value</th>
+        <th>Budgeted GP%</th>
+        <th>Projected GP%</th>
+        <th>Actual Spend</th>
+        <th>Variance</th>
+        <th style="width:140px">Margin Bar</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  jobs.forEach(job => {
+    const name = job.location?.account?.name || job.name;
+    const price = job.projectedPrice;
+    const projCost = job.projectedCost;
+    const actualCost = job.actualCost || 0;
+
+    const projMargin = price && projCost ? (price - projCost) / price * 100 : null;
+    const actualMargin = price && actualCost ? (price - actualCost) / price * 100 : null;
+
+    // Budgeted GP% from Construction Agreement documents
+    const budgetedMargin = job.budgetedPriceTotal > 0
+      ? (job.budgetedPriceTotal - job.budgetedCostTotal) / job.budgetedPriceTotal * 100
+      : null;
+
+    const variance = budgetedMargin !== null && projMargin !== null ? projMargin - budgetedMargin : null;
+
+    const barPct = projMargin !== null ? Math.min(Math.max(projMargin, 0), 60) / 60 * 100 : 0;
+
+    html += `<tr>
+      <td>${name}</td>
+      <td class="neutral">${fmt(price)}</td>
+      <td class="neutral">${fmtPct(budgetedMargin)}</td>
+      <td class="${varianceClass(variance)}">${fmtPct(projMargin)}</td>
+      <td class="neutral">${fmt(actualCost)}</td>
+      <td class="${variance !== null ? (variance >= 0 ? 'ok' : 'over') : 'neutral'}">${variance !== null ? fmtPct(variance) : '—'}</td>
+      <td class="bar-cell">
+        <div class="bar-wrap">
+          <div class="bar-fill" style="width:${barPct}%;background:${barColor(variance)}"></div>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+  document.getElementById('table-area').innerHTML = html;
+}
+
+window.addEventListener('DOMContentLoaded', loadReport);
+setInterval(loadReport, 60 * 60 * 1000);
+</script>
+</body>
+</html>
