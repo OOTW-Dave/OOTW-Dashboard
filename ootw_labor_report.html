@@ -234,14 +234,14 @@ function renderReport(jobs) {
   const totA = { LC:0, Staff:0, Apprentice:0 };
 
   jobs.forEach(j => {
-    types.forEach(t => {
-      totB[t] += j.budgeted[t] || 0;
-      totA[t] += j.actual[t] || 0;
+    ['LC','Staff','Apprentice','Other'].forEach(t => {
+      totB[t] = (totB[t]||0) + (j.budgeted[t] || 0);
+      totA[t] = (totA[t]||0) + (j.actual[t] || 0);
     });
   });
 
-  const grandB = totB.LC + totB.Staff + totB.Apprentice;
-  const grandA = totA.LC + totA.Staff + totA.Apprentice;
+  const grandB = (totB.LC||0) + (totB.Staff||0) + (totB.Apprentice||0) + (totB.Other||0);
+  const grandA = (totA.LC||0) + (totA.Staff||0) + (totA.Apprentice||0) + (totA.Other||0);
   const grandPct = pct(grandA, grandB);
 
   // Table
@@ -252,6 +252,7 @@ function renderReport(jobs) {
         <th>LC Budget</th><th>LC Actual</th>
         <th>Staff Budget</th><th>Staff Actual</th>
         <th>App. Budget</th><th>App. Actual</th>
+        <th>Other Budget</th><th>Other Actual</th>
         <th>Total Budget</th><th>Total Actual</th><th>%</th>
       </tr>
     </thead>
@@ -260,8 +261,8 @@ function renderReport(jobs) {
   jobs.forEach(job => {
     const b = job.budgeted;
     const a = job.actual;
-    const totalB = b.LC + b.Staff + b.Apprentice;
-    const totalA = a.LC + a.Staff + a.Apprentice;
+    const totalB = (b.LC||0) + (b.Staff||0) + (b.Apprentice||0) + (b.Other||0);
+    const totalA = (a.LC||0) + (a.Staff||0) + (a.Apprentice||0) + (a.Other||0);
     const p = pct(totalA, totalB);
     const isOver = totalA > totalB * 1.05;
     const badge = totalB > 0 ? `<span class="badge ${isOver ? 'badge-over' : 'badge-ok'}">${isOver ? '▲ over' : '✓ ok'}</span>` : '';
@@ -274,6 +275,8 @@ function renderReport(jobs) {
       <td class="${a.Staff > b.Staff * 1.05 ? 'over' : a.Staff > 0 ? 'ok' : 'neutral'}">${a.Staff ? fmt(a.Staff) : '—'}</td>
       <td class="neutral">${b.Apprentice ? fmt(b.Apprentice) : '—'}</td>
       <td class="${a.Apprentice > b.Apprentice * 1.05 ? 'over' : a.Apprentice > 0 ? 'ok' : 'neutral'}">${a.Apprentice ? fmt(a.Apprentice) : '—'}</td>
+      <td class="neutral">${b.Other ? fmt(b.Other) : '—'}</td>
+      <td class="${a.Other > b.Other * 1.05 ? 'over' : a.Other > 0 ? 'ok' : 'neutral'}">${a.Other ? fmt(a.Other) : '—'}</td>
       <td class="neutral">${fmt(totalB)}</td>
       <td class="${isOver ? 'over' : 'ok'}">${fmt(totalA)}</td>
       <td class="${pctClass(p)}">${p !== null ? p + '%' : '—'}</td>
@@ -287,6 +290,7 @@ function renderReport(jobs) {
         <td>${fmt(totB.LC)}</td><td class="${totA.LC > totB.LC*1.05 ? 'over':'ok'}">${fmt(totA.LC)}</td>
         <td>${fmt(totB.Staff)}</td><td class="${totA.Staff > totB.Staff*1.05 ? 'over':'ok'}">${fmt(totA.Staff)}</td>
         <td>${fmt(totB.Apprentice)}</td><td class="${totA.Apprentice > totB.Apprentice*1.05 ? 'over':'ok'}">${fmt(totA.Apprentice)}</td>
+        <td>${fmt(totB.Other||0)}</td><td class="${(totA.Other||0) > (totB.Other||0)*1.05 ? 'over':'ok'}">${fmt(totA.Other||0)}</td>
         <td>${fmt(grandB)}</td>
         <td class="${grandA > grandB ? 'over':'ok'}">${fmt(grandA)}</td>
         <td class="${pctClass(grandPct)}">${grandPct !== null ? grandPct+'%' : '—'}</td>
