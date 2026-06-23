@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOTW — Pipeline Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+  .top { background: #1a1a1a; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .top h1 { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+  .top span { font-size: 12px; color: #888; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card { background: #fff; border-radius: 10px; border: 1px solid #e8e8e6; overflow: hidden; }
+  .card.full { grid-column: 1 / -1; }
+  .card-head { padding: 14px 20px; border-bottom: 1px solid #e8e8e6; display: flex; align-items: center; justify-content: space-between; }
+  .card-head h2 { font-size: 13px; font-weight: 500; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
+  .btn { padding: 8px 18px; font-size: 13px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; background: #f0f0ee; color: #1a1a1a; font-family: inherit; }
+  .btn:hover { background: #e8e8e6; }
+  .controls { display: flex; gap: 10px; align-items: center; }
+  .status { font-size: 12px; color: #888; }
+  .loading { padding: 40px; text-align: center; color: #888; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* Bar chart */
+  .bar-chart { padding: 16px 20px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bar-label { font-size: 12px; color: #555; width: 70px; text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; background: #f0f0ee; border-radius: 99px; height: 22px; overflow: hidden; }
+  .bar-fill { height: 22px; border-radius: 99px; background: #1a1a1a; display: flex; align-items: center; padding-left: 8px; min-width: 30px; transition: width 0.4s ease; }
+  .bar-fill span { font-size: 11px; color: #fff; font-weight: 500; white-space: nowrap; }
+  /* Pie chart */
+  .pie-wrap { padding: 20px; display: flex; align-items: center; gap: 24px; }
+  svg.pie { flex-shrink: 0; }
+  .legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { color: #555; }
+  .legend-value { font-weight: 600; margin-left: auto; padding-left: 16px; }
+  /* Stat */
+  .stat-wrap { padding: 24px 20px; }
+  .stat-number { font-size: 42px; font-weight: 300; line-height: 1; color: #1a1a1a; }
+  .stat-label { font-size: 12px; color: #888; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-sub { font-size: 13px; color: #555; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Out of the Woods — Pipeline Report</h1>
+  <span id="last-updated"></span>
+</div>
+
+<div class="container">
+  <div class="card full" id="leads-card">
+    <div class="card-head">
+      <h2>New Leads per Month (YTD)</h2>
+      <div class="controls">
+        <button class="btn" onclick="loadReport()">↻ Refresh</button>
+        <span class="status" id="report-status"></span>
+      </div>
+    </div>
+    <div class="bar-chart" id="leads-chart"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+  </div>
+
+  <div class="card" id="wonlost-card">
+    <div class="card-head"><h2>Won vs Lost (YTD)</h2></div>
+    <div class="pie-wrap" id="wonlost-chart"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+  </div>
+
+  <div class="card" id="avgdays-card">
+    <div class="card-head"><h2>Avg Days Lead to Close (YTD)</h2></div>
+    <div class="stat-wrap" id="avgdays-stat"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+  </div>
+</div>
+
+<script>
+const ORG_ID = '22PEnmupQzLy';
+const STATUS_CF = '22PEnmvm85Ad';
+const LEAD_DATE_CF = '22PYznLXvpbn';
+const OUTCOME_DATE_CF = '22PYznLnyz9R';
+const GRANT_KEY = '22TSP4tXi4XtJCf3kydhJhLCjXytzHFeBm';
+
+const WON_STATUSES = new Set(['Contract Signed, Not Started', 'In Production', 'Job Complete']);
+const LOST_STATUSES = new Set(['Lost - after ILM, before brown bag', 'Lost - after brown bag, before DA', 'Lost - during design', 'OOTW Dropped', 'Client Postponed']);
+const EXCLUDE = new Set(['22PRPSP7jMP2']); // Internal OOTW job
+
+async function query(q) {
+  const res = await fetch('https://api.jobtread.com/pave', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GRANT_KEY}` },
+    body: JSON.stringify({ query: q })
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function getCFValue(job, cfId) {
+  return job.customFieldValues?.nodes?.find(c => c.customField?.id === cfId)?.value || null;
+}
+
+function daysBetween(d1, d2) {
+  return Math.round((new Date(d2) - new Date(d1)) / (1000 * 60 * 60 * 24));
+}
+
+async function loadReport() {
+  document.getElementById('report-status').textContent = 'Loading...';
+
+  try {
+    const thisYear = new Date().getFullYear();
+
+    const res = await query({
+      organization: {
+        $: { id: ORG_ID },
+        jobs: {
+          $: { size: 100 },
+          nodes: {
+            id: {},
+            customFieldValues: { $: { size: 6 }, nodes: { customField: { id: {} }, value: {} } }
+          }
+        }
+      }
+    });
+
+    const jobs = res.organization.jobs.nodes.filter(j => !EXCLUDE.has(j.id));
+
+    // --- New Leads by Month YTD ---
+    const monthCounts = {};
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    for (let i = 0; i < 12; i++) monthCounts[i] = 0;
+
+    jobs.forEach(job => {
+      const leadDate = getCFValue(job, LEAD_DATE_CF);
+      if (!leadDate) return;
+      const d = new Date(leadDate);
+      if (d.getFullYear() !== thisYear) return;
+      monthCounts[d.getMonth()]++;
+    });
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const maxCount = Math.max(...Object.values(monthCounts), 1);
+
+    let leadsHtml = '';
+    for (let i = 0; i <= currentMonth; i++) {
+      const count = monthCounts[i];
+      const pct = (count / maxCount) * 100;
+      leadsHtml += `<div class="bar-row">
+        <div class="bar-label">${months[i]}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${Math.max(pct, 8)}%"><span>${count}</span></div>
+        </div>
+      </div>`;
+    }
+    document.getElementById('leads-chart').innerHTML = leadsHtml;
+
+    // --- Won vs Lost YTD ---
+    let won = 0, lost = 0;
+    const wonJobs = [];
+    jobs.forEach(job => {
+      const outcomeDate = getCFValue(job, OUTCOME_DATE_CF);
+      if (!outcomeDate) return; // Must have a Sales Outcome Date
+      const d = new Date(outcomeDate);
+      if (d.getFullYear() !== thisYear) return;
+      // Exclude warranty jobs (by name or remodel type)
+      const jobName = (job.name || '').toLowerCase();
+      if (jobName.includes('warranty')) return;
+      const remodelTypes = job.customFieldValues?.nodes
+        ?.filter(c => c.customField?.id === '22PExuEbgZfq')
+        ?.map(c => (c.value || '').toLowerCase()) || [];
+      if (remodelTypes.includes('warranty')) return;
+      const status = getCFValue(job, STATUS_CF);
+      if (WON_STATUSES.has(status)) { won++; wonJobs.push(job); }
+      else if (LOST_STATUSES.has(status)) lost++;
+    });
+
+    const total = won + lost;
+    const wonPct = total > 0 ? won / total : 0;
+    const lostPct = total > 0 ? lost / total : 0;
+
+    // Draw pie
+    const size = 120;
+    const cx = size / 2, cy = size / 2, r = 50;
+    function polarToCartesian(angle) {
+      const rad = (angle - 90) * Math.PI / 180;
+      return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+    }
+    function arcPath(startAngle, endAngle, color) {
+      if (endAngle - startAngle >= 360) endAngle = 359.99;
+      const s = polarToCartesian(startAngle);
+      const e = polarToCartesian(endAngle);
+      const large = endAngle - startAngle > 180 ? 1 : 0;
+      return `<path d="M${cx},${cy} L${s.x},${s.y} A${r},${r} 0 ${large},1 ${e.x},${e.y} Z" fill="${color}"/>`;
+    }
+
+    let pieSvg = `<svg class="pie" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+    if (total === 0) {
+      pieSvg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e8e8e6"/>`;
+    } else {
+      const wonDeg = wonPct * 360;
+      pieSvg += arcPath(0, wonDeg, '#27ae60');
+      pieSvg += arcPath(wonDeg, 360, '#c0392b');
+    }
+    pieSvg += `</svg>`;
+
+    document.getElementById('wonlost-chart').innerHTML = `
+      ${pieSvg}
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#27ae60"></div>
+          <span class="legend-label">Won</span>
+          <span class="legend-value" style="color:#27ae60">${won}</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#c0392b"></div>
+          <span class="legend-label">Lost</span>
+          <span class="legend-value" style="color:#c0392b">${lost}</span>
+        </div>
+        <div class="legend-item" style="margin-top:4px;border-top:1px solid #e8e8e6;padding-top:8px">
+          <span class="legend-label">Win rate</span>
+          <span class="legend-value">${total > 0 ? Math.round(wonPct * 100) : '—'}%</span>
+        </div>
+      </div>`;
+
+    // --- Avg Days Lead to Close ---
+    const closedDays = wonJobs
+      .map(job => {
+        const lead = getCFValue(job, LEAD_DATE_CF);
+        const outcome = getCFValue(job, OUTCOME_DATE_CF);
+        if (!lead || !outcome) return null;
+        return daysBetween(lead, outcome);
+      })
+      .filter(d => d !== null && d >= 0);
+
+    const avgDays = closedDays.length > 0
+      ? Math.round(closedDays.reduce((a, b) => a + b, 0) / closedDays.length)
+      : null;
+
+    const avgWeeks = avgDays !== null ? (avgDays / 7).toFixed(1) : null;
+
+    document.getElementById('avgdays-stat').innerHTML = avgDays !== null ? `
+      <div class="stat-number">${avgDays}</div>
+      <div class="stat-label">Average days from lead to close</div>
+      <div class="stat-sub">${avgWeeks} weeks &nbsp;·&nbsp; Based on ${closedDays.length} closed jobs YTD</div>
+    ` : `<div class="stat-sub" style="padding:20px;color:#888">Not enough data yet</div>`;
+
+    const now2 = new Date();
+    document.getElementById('last-updated').textContent = `Updated ${now2.toLocaleTimeString()}`;
+    document.getElementById('report-status').textContent = `${jobs.length} jobs loaded`;
+
+  } catch(err) {
+    document.getElementById('report-status').textContent = `Error: ${err.message}`;
+    document.getElementById('leads-chart').innerHTML = `<div class="loading">Failed: ${err.message}</div>`;
+  }
+}
+
+window.addEventListener('DOMContentLoaded', loadReport);
+setInterval(loadReport, 60 * 60 * 1000);
+</script>
+</body>
+</html>
