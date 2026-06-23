@@ -170,30 +170,31 @@ async function loadReport() {
       const budgeted = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
       const actual = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
 
-      // Get the latest approved customer order for this job
+      // Strategy: try document-level cost items first (for itemized contracts)
+      // Fall back to job-level cost items (for lump-sum contracts)
       const orderRes = await query({
         job: {
           $: { id: job.id },
           documents: {
-            $: { size: 20, where: { and: [
+            $: { size: 50, where: { and: [
               { '=': [{ field: ['type'] }, { value: 'customerOrder' }] },
-              { '=': [{ field: ['status'] }, { value: 'approved' }] }
+              { '=': [{ field: ['status'] }, { value: 'approved' }] },
+              { '=': [{ field: ['includeInBudget'] }, { value: true }] }
             ]}},
-            nodes: { id: {}, number: {} }
+            nodes: { id: {}, name: {}, number: {} }
           }
         }
       });
       const orders = orderRes.job.documents?.nodes || [];
-      // Use the highest-numbered approved order (most recent)
-      const latestOrder = orders.reduce((a, b) => (b.number > a.number ? b : a), orders[0]);
 
-      if (latestOrder) {
-        // Fetch budgeted labor cost items directly from the Construction Agreement document
+      // Try fetching from documents first
+      const docBudgeted = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
+      for (const order of orders) {
         let ciPage = null;
         do {
           const ciRes = await query({
             document: {
-              $: { id: latestOrder.id },
+              $: { id: order.id },
               costItems: {
                 $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: {
                   '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }]
@@ -204,16 +205,45 @@ async function loadReport() {
             }
           });
           (ciRes.document.costItems?.nodes || []).forEach(ci => {
-            if (!ci.jobCostItem?.id) {
-              const t = getNameType(ci.name);
-              budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
-            }
+            // Don't filter by jobCostItem when querying through document
+            const t = getNameType(ci.name);
+            docBudgeted[t] = (docBudgeted[t] || 0) + (ci.cost || 0);
           });
           ciPage = ciRes.document.costItems?.nextPage || null;
         } while (ciPage);
       }
 
-      // Fetch ALL time entries (paginated)
+      const docTotal = (docBudgeted.LC||0) + (docBudgeted.Staff||0) + (docBudgeted.Apprentice||0) + (docBudgeted.Other||0);
+
+      if (docTotal > 0) {
+        // Use document-level items
+        Object.assign(budgeted, docBudgeted);
+      } else {
+        // Fall back to job-level cost items (lump sum contract)
+        let ciPage = null;
+        do {
+          const ciRes = await query({
+            job: {
+              $: { id: job.id },
+              costItems: {
+                $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: { and: [
+                  { '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }] },
+                  { '=': [{ field: ['jobCostItem', 'id'] }, { value: null }] }
+                ]}},
+                nextPage: {},
+                nodes: { cost: {}, name: {} }
+              }
+            }
+          });
+          (ciRes.job.costItems?.nodes || []).forEach(ci => {
+            const t = getNameType(ci.name);
+            budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
+          });
+          ciPage = ciRes.job.costItems?.nextPage || null;
+        } while (ciPage);
+      }
+
+            // Fetch ALL time entries (paginated)
       let tePage = null;
       do {
         const teRes = await query({
