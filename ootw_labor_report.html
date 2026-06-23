@@ -195,18 +195,19 @@ async function loadReport() {
             document: {
               $: { id: latestOrder.id },
               costItems: {
-                $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: { and: [
-                  { '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }] },
-                  { '=': [{ field: ['jobCostItem', 'id'] }, { value: null }] }
-                ]}},
+                $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: {
+                  '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }]
+                }},
                 nextPage: {},
-                nodes: { cost: {}, name: {} }
+                nodes: { cost: {}, name: {}, jobCostItem: { id: {} } }
               }
             }
           });
           (ciRes.document.costItems?.nodes || []).forEach(ci => {
-            const t = getNameType(ci.name);
-            budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
+            if (!ci.jobCostItem?.id) {
+              const t = getNameType(ci.name);
+              budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
+            }
           });
           ciPage = ciRes.document.costItems?.nextPage || null;
         } while (ciPage);
