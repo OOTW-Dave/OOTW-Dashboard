@@ -50,6 +50,12 @@
   .stat-value.over { color: #c0392b; }
   .stat-value.ok { color: #27ae60; }
   .loading { padding: 40px; text-align: center; color: #888; }
+  .tabs { display: flex; gap: 0; margin-bottom: -1px; }
+  .tab { padding: 8px 20px; font-size: 13px; cursor: pointer; border: 1px solid #e8e8e6; border-bottom: none; border-radius: 6px 6px 0 0; background: #f5f5f3; color: #888; font-family: inherit; }
+  .tab.active { background: #fff; color: #1a1a1a; font-weight: 500; }
+  .tab:hover:not(.active) { background: #eee; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
   .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
@@ -66,13 +72,24 @@
   <div id="report-area">
     <div class="card">
       <div class="card-head">
-        <h2>Budgeted vs Actual Labor by Job — In Production</h2>
+        <h2>Labor Report — In Production</h2>
         <div class="controls">
           <button class="btn btn-secondary" onclick="loadReport()">↻ Refresh</button>
           <span class="status" id="report-status"></span>
         </div>
       </div>
-      <div id="table-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+      <div style="padding: 0 20px">
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('dollars')">$ Dollars</button>
+          <button class="tab" onclick="switchTab('hours')">⏱ Hours</button>
+        </div>
+      </div>
+      <div class="tab-content active" id="tab-dollars">
+        <div id="table-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+      </div>
+      <div class="tab-content" id="tab-hours">
+        <div id="hours-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+      </div>
     </div>
   </div>
 
@@ -129,6 +146,13 @@ async function query(q) {
   return res.json();
 }
 
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector(`#tab-${tab}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
 async function loadReport() {
   document.getElementById('report-status').textContent = 'Loading...';
   document.getElementById('report-status').className = 'status';
@@ -169,6 +193,8 @@ async function loadReport() {
 
       const budgeted = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
       const actual = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
+      const hoursB = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
+      const hoursA = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
 
       // Strategy: try document-level cost items first (for itemized contracts)
       // Fall back to job-level cost items (for lump-sum contracts)
@@ -200,14 +226,14 @@ async function loadReport() {
                   '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }]
                 }},
                 nextPage: {},
-                nodes: { cost: {}, name: {}, jobCostItem: { id: {} } }
+                nodes: { cost: {}, name: {}, quantity: {}, jobCostItem: { id: {} } }
               }
             }
           });
           (ciRes.document.costItems?.nodes || []).forEach(ci => {
-            // Don't filter by jobCostItem when querying through document
             const t = getNameType(ci.name);
             docBudgeted[t] = (docBudgeted[t] || 0) + (ci.cost || 0);
+            if (ci.quantity) hoursB[t] = (hoursB[t] || 0) + ci.quantity;
           });
           ciPage = ciRes.document.costItems?.nextPage || null;
         } while (ciPage);
@@ -231,13 +257,14 @@ async function loadReport() {
                   { '=': [{ field: ['jobCostItem', 'id'] }, { value: null }] }
                 ]}},
                 nextPage: {},
-                nodes: { cost: {}, name: {} }
+                nodes: { cost: {}, name: {}, quantity: {} }
               }
             }
           });
           (ciRes.job.costItems?.nodes || []).forEach(ci => {
             const t = getNameType(ci.name);
             budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
+            if (ci.quantity) hoursB[t] = (hoursB[t] || 0) + ci.quantity;
           });
           ciPage = ciRes.job.costItems?.nextPage || null;
         } while (ciPage);
@@ -252,21 +279,23 @@ async function loadReport() {
             timeEntries: {
               $: { size: 100, ...(tePage ? { page: tePage } : {}) },
               nextPage: {},
-              nodes: { cost: {}, user: { id: {} } }
+              nodes: { cost: {}, minutes: {}, user: { id: {} } }
             }
           }
         });
         (teRes.job.timeEntries?.nodes || []).forEach(te => {
           const t = getUserType(te.user?.id);
           actual[t] = (actual[t] || 0) + (te.cost || 0);
+          hoursA[t] = (hoursA[t] || 0) + ((te.minutes || 0) / 60);
         });
         tePage = teRes.job.timeEntries?.nextPage || null;
       } while (tePage);
 
-      jobData.push({ name: job.name, budgeted, actual });
+      jobData.push({ name: job.name, budgeted, actual, hoursB, hoursA });
     }
 
     renderReport(jobData);
+    renderHours(jobData);
     const now = new Date();
     document.getElementById('last-updated').textContent = `Updated ${now.toLocaleTimeString()}`;
     document.getElementById('report-status').textContent = `${jobData.length} jobs loaded`;
@@ -303,7 +332,7 @@ function renderReport(jobs) {
         <th>Staff Budget</th><th>Staff Actual</th>
         <th>App. Budget</th><th>App. Actual</th>
         <th>Other Budget</th><th>Other Actual</th>
-        <th>Total Budget</th><th>Total Actual</th><th>%</th>
+        <th>Total Budget</th><th>Total Actual</th><th>Remaining</th><th>%</th>
       </tr>
     </thead>
     <tbody>`;
@@ -329,6 +358,7 @@ function renderReport(jobs) {
       <td class="${a.Other > b.Other * 1.05 ? 'over' : a.Other > 0 ? 'ok' : 'neutral'}">${a.Other ? fmt(a.Other) : '—'}</td>
       <td class="neutral">${fmt(totalB)}</td>
       <td class="${isOver ? 'over' : 'ok'}">${fmt(totalA)}</td>
+      <td class="${totalB - totalA < 0 ? 'over' : totalB - totalA < totalB * 0.15 ? 'warn' : 'ok'}">${fmt(totalB - totalA)}</td>
       <td class="${pctClass(p)}">${p !== null ? p + '%' : '—'}</td>
     </tr>`;
   });
@@ -343,6 +373,7 @@ function renderReport(jobs) {
         <td>${fmt(totB.Other||0)}</td><td class="${(totA.Other||0) > (totB.Other||0)*1.05 ? 'over':'ok'}">${fmt(totA.Other||0)}</td>
         <td>${fmt(grandB)}</td>
         <td class="${grandA > grandB ? 'over':'ok'}">${fmt(grandA)}</td>
+        <td class="${grandB - grandA < 0 ? 'over' : grandB - grandA < grandB * 0.15 ? 'warn' : 'ok'}">${fmt(grandB - grandA)}</td>
         <td class="${pctClass(grandPct)}">${grandPct !== null ? grandPct+'%' : '—'}</td>
       </tr>
     </tfoot>
@@ -350,6 +381,78 @@ function renderReport(jobs) {
 
   document.getElementById('table-area').innerHTML = html;
 }
+function fmtH(h) {
+  return h > 0 ? Math.round(h * 10) / 10 + 'h' : '—';
+}
+
+function renderHours(jobs) {
+  const types = ['LC', 'Staff', 'Apprentice'];
+  const totB = { LC:0, Staff:0, Apprentice:0 };
+  const totA = { LC:0, Staff:0, Apprentice:0 };
+
+  jobs.forEach(j => {
+    types.forEach(t => {
+      totB[t] += j.hoursB[t] || 0;
+      totA[t] += j.hoursA[t] || 0;
+    });
+  });
+
+  const grandB = totB.LC + totB.Staff + totB.Apprentice;
+  const grandA = totA.LC + totA.Staff + totA.Apprentice;
+
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>Job</th>
+        <th>LC Budget</th><th>LC Actual</th><th>LC %</th>
+        <th>Staff Budget</th><th>Staff Actual</th><th>Staff %</th>
+        <th>App. Budget</th><th>App. Actual</th><th>App. %</th>
+        <th>Total Budget</th><th>Total Actual</th><th>Remaining</th><th>%</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  jobs.forEach(job => {
+    const b = job.hoursB;
+    const a = job.hoursA;
+    const totalB = (b.LC||0) + (b.Staff||0) + (b.Apprentice||0);
+    const totalA = (a.LC||0) + (a.Staff||0) + (a.Apprentice||0);
+    const p = pct(totalA, totalB);
+
+    html += `<tr>
+      <td>${job.name}</td>
+      <td class="neutral">${fmtH(b.LC||0)}</td>
+      <td class="${pctClass(pct(a.LC||0, b.LC||0))}">${fmtH(a.LC||0)}</td>
+      <td class="${pctClass(pct(a.LC||0, b.LC||0))}">${pct(a.LC||0, b.LC||0) !== null ? pct(a.LC||0, b.LC||0)+'%' : '—'}</td>
+      <td class="neutral">${fmtH(b.Staff||0)}</td>
+      <td class="${pctClass(pct(a.Staff||0, b.Staff||0))}">${fmtH(a.Staff||0)}</td>
+      <td class="${pctClass(pct(a.Staff||0, b.Staff||0))}">${pct(a.Staff||0, b.Staff||0) !== null ? pct(a.Staff||0, b.Staff||0)+'%' : '—'}</td>
+      <td class="neutral">${fmtH(b.Apprentice||0)}</td>
+      <td class="${pctClass(pct(a.Apprentice||0, b.Apprentice||0))}">${fmtH(a.Apprentice||0)}</td>
+      <td class="${pctClass(pct(a.Apprentice||0, b.Apprentice||0))}">${pct(a.Apprentice||0, b.Apprentice||0) !== null ? pct(a.Apprentice||0, b.Apprentice||0)+'%' : '—'}</td>
+      <td class="neutral">${fmtH(totalB)}</td>
+      <td class="${pctClass(p)}">${fmtH(totalA)}</td>
+      <td class="${pctClass(p)}">${p !== null ? p+'%' : '—'}</td>
+    </tr>`;
+  });
+
+  html += `</tbody>
+    <tfoot>
+      <tr class="totals-row">
+        <td>Total</td>
+        <td>${fmtH(totB.LC)}</td><td class="${pctClass(pct(totA.LC,totB.LC))}">${fmtH(totA.LC)}</td><td class="${pctClass(pct(totA.LC,totB.LC))}">${pct(totA.LC,totB.LC) !== null ? pct(totA.LC,totB.LC)+'%' : '—'}</td>
+        <td>${fmtH(totB.Staff)}</td><td class="${pctClass(pct(totA.Staff,totB.Staff))}">${fmtH(totA.Staff)}</td><td class="${pctClass(pct(totA.Staff,totB.Staff))}">${pct(totA.Staff,totB.Staff) !== null ? pct(totA.Staff,totB.Staff)+'%' : '—'}</td>
+        <td>${fmtH(totB.Apprentice)}</td><td class="${pctClass(pct(totA.Apprentice,totB.Apprentice))}">${fmtH(totA.Apprentice)}</td><td class="${pctClass(pct(totA.Apprentice,totB.Apprentice))}">${pct(totA.Apprentice,totB.Apprentice) !== null ? pct(totA.Apprentice,totB.Apprentice)+'%' : '—'}</td>
+        <td>${fmtH(grandB)}</td>
+        <td class="${pctClass(pct(grandA,grandB))}">${fmtH(grandA)}</td>
+        <td class="${pctClass(pct(grandA,grandB))}">${pct(grandA,grandB) !== null ? pct(grandA,grandB)+'%' : '—'}</td>
+      </tr>
+    </tfoot>
+  </table>`;
+
+  document.getElementById('hours-area').innerHTML = html;
+}
+
 window.addEventListener("DOMContentLoaded", loadReport);
 </script>
 </body>
