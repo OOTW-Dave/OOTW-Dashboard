@@ -170,28 +170,48 @@ async function loadReport() {
       const budgeted = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
       const actual = { LC: 0, Staff: 0, Apprentice: 0, Other: 0 };
 
-      // Fetch budgeted labor cost items - top-level only (jobCostItem = null), paginated
-      let ciPage = null;
-      do {
-        const ciRes = await query({
-          job: {
-            $: { id: job.id },
-            costItems: {
-              $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: { and: [
-                { '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }] },
-                { '=': [{ field: ['jobCostItem', 'id'] }, { value: null }] }
-              ]}},
-              nextPage: {},
-              nodes: { cost: {}, name: {} }
-            }
+      // Get the latest approved customer order for this job
+      const orderRes = await query({
+        job: {
+          $: { id: job.id },
+          documents: {
+            $: { size: 20, where: { and: [
+              { '=': [{ field: ['type'] }, { value: 'customerOrder' }] },
+              { '=': [{ field: ['status'] }, { value: 'approved' }] }
+            ]}},
+            nodes: { id: {}, number: {} }
           }
-        });
-        (ciRes.job.costItems?.nodes || []).forEach(ci => {
-          const t = getNameType(ci.name);
-          budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
-        });
-        ciPage = ciRes.job.costItems?.nextPage || null;
-      } while (ciPage);
+        }
+      });
+      const orders = orderRes.job.documents?.nodes || [];
+      // Use the highest-numbered approved order (most recent)
+      const latestOrder = orders.reduce((a, b) => (b.number > a.number ? b : a), orders[0]);
+
+      if (latestOrder) {
+        // Fetch budgeted labor cost items from latest order only
+        let ciPage = null;
+        do {
+          const ciRes = await query({
+            job: {
+              $: { id: job.id },
+              costItems: {
+                $: { size: 100, ...(ciPage ? { page: ciPage } : {}), where: { and: [
+                  { '=': [{ field: ['costType', 'id'] }, { value: LABOR_TYPE_ID }] },
+                  { '=': [{ field: ['jobCostItem', 'id'] }, { value: null }] },
+                  { '=': [{ field: ['document', 'id'] }, { value: latestOrder.id }] }
+                ]}},
+                nextPage: {},
+                nodes: { cost: {}, name: {} }
+              }
+            }
+          });
+          (ciRes.job.costItems?.nodes || []).forEach(ci => {
+            const t = getNameType(ci.name);
+            budgeted[t] = (budgeted[t] || 0) + (ci.cost || 0);
+          });
+          ciPage = ciRes.job.costItems?.nextPage || null;
+        } while (ciPage);
+      }
 
       // Fetch ALL time entries (paginated)
       let tePage = null;
