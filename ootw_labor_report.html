@@ -129,7 +129,6 @@ async function query(q) {
 async function loadReport() {
   document.getElementById('report-status').textContent = 'Loading...';
   document.getElementById('report-status').className = 'status';
-  document.getElementById('setup-status').textContent = '✓ Connected';
   document.getElementById('table-area').innerHTML = '<div class="loading"><span class="spinner"></span>Fetching jobs...</div>';
   document.getElementById('summary').innerHTML = '';
 
