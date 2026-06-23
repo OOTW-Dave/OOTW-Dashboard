@@ -133,7 +133,6 @@ async function loadReport() {
   document.getElementById('report-status').textContent = 'Loading...';
   document.getElementById('report-status').className = 'status';
   document.getElementById('table-area').innerHTML = '<div class="loading"><span class="spinner"></span>Fetching jobs...</div>';
-  document.getElementById('summary').innerHTML = '';
 
   try {
     // Step 1: Get all open jobs with Status = In Production
