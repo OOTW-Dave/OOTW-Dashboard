@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOTW — Financial Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+  .top { background: #1a1a1a; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .top h1 { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+  .top span { font-size: 12px; color: #888; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card { background: #fff; border-radius: 10px; border: 1px solid #e8e8e6; overflow: hidden; }
+  .card.full { grid-column: 1 / -1; }
+  .card-head { padding: 14px 20px; border-bottom: 1px solid #e8e8e6; display: flex; align-items: center; justify-content: space-between; }
+  .card-head h2 { font-size: 13px; font-weight: 500; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
+  .btn { padding: 8px 18px; font-size: 13px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; background: #f0f0ee; color: #1a1a1a; font-family: inherit; }
+  .btn:hover { background: #e8e8e6; }
+  .controls { display: flex; gap: 10px; align-items: center; }
+  .status { font-size: 12px; color: #888; }
+  .loading { padding: 40px; text-align: center; color: #888; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .stat { padding: 20px; border-right: 1px solid #e8e8e6; }
+  .stat:last-child { border-right: none; }
+  .stat-number { font-size: 32px; font-weight: 300; line-height: 1; }
+  .stat-label { font-size: 11px; color: #888; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 10px 12px; text-align: right; font-weight: 500; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e8e8e6; background: #fafaf8; }
+  thead th:first-child { text-align: left; }
+  td { padding: 10px 12px; text-align: right; border-bottom: 1px solid #f0f0ee; }
+  td:first-child { text-align: left; font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafaf8; }
+  .warn { color: #e67e22; font-weight: 600; }
+  .ok { color: #27ae60; }
+  .neutral { color: #888; }
+  /* Bar chart */
+  .bar-chart { padding: 16px 20px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-label { font-size: 11px; color: #555; width: 32px; text-align: right; flex-shrink: 0; }
+  .bar-group { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .bar-track { background: #f0f0ee; border-radius: 3px; height: 14px; overflow: hidden; }
+  .bar-fill { height: 14px; border-radius: 3px; display: flex; align-items: center; padding: 0 6px; min-width: 2px; }
+  .bar-fill span { font-size: 10px; color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; }
+  .bar-legend { display: flex; gap: 16px; padding: 8px 20px 16px; }
+  .bar-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+  .bar-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Out of the Woods — Financial Report</h1>
+  <span id="last-updated"></span>
+</div>
+
+<div class="container">
+  <!-- Outstanding Receivables + Unbilled -->
+  <div class="card">
+    <div class="card-head">
+      <h2>Receivables & Unbilled</h2>
+      <div class="controls">
+        <button class="btn" onclick="loadReport()">↻ Refresh</button>
+        <span class="status" id="report-status"></span>
+      </div>
+    </div>
+    <div id="receivables-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+  </div>
+
+  <!-- Unbilled by Job -->
+  <div class="card">
+    <div class="card-head"><h2>Unbilled by Active Job</h2></div>
+    <div id="unbilled-area"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+  </div>
+
+  <!-- Cash In vs Out -->
+  <div class="card full">
+    <div class="card-head"><h2>Cash In vs Out — YTD</h2></div>
+    <div style="padding:8px 20px 0;font-size:11px;color:#888">Note: Cash Out reflects vendor bills & materials only — payroll is not captured in JobTread</div>
+    <div class="bar-legend">
+      <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#27ae60"></div>Cash In (Invoices)</div>
+      <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#c0392b"></div>Bills (Subs/Materials)</div>
+      <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#e67e22"></div>Labor (Burdened)</div>
+    </div>
+    <div class="bar-chart" id="cashflow-chart"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+  </div>
+</div>
+
+<script>
+const ORG_ID = '22PEnmupQzLy';
+const STATUS_CF = '22PEnmvm85Ad';
+const GRANT_KEY = '22TSP4tXi4XtJCf3kydhJhLCjXytzHFeBm';
+const INTERNAL_JOB = '22PRPSP7jMP2';
+
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  return '$' + Math.round(n).toLocaleString();
+}
+
+async function query(q) {
+  const res = await fetch('https://api.jobtread.com/pave', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GRANT_KEY}` },
+    body: JSON.stringify({ query: q })
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function loadReport() {
+  document.getElementById('report-status').textContent = 'Loading...';
+
+  try {
+    const thisYear = new Date().getFullYear();
+
+    // 1. Outstanding receivables
+    const recRes = await query({
+      organization: {
+        $: { id: ORG_ID },
+        documents: {
+          $: { size: 100, where: { and: [
+            { '=': [{ field: ['type'] }, { value: 'customerInvoice' }] },
+            { '>': [{ field: ['balance'] }, { value: 0 }] }
+          ]}},
+          nodes: { balance: {}, issueDate: {}, job: { id: {}, location: { account: { name: {} } } }, price: {}, status: {} }
+        }
+      }
+    });
+
+    const openInvoices = recRes.organization.documents.nodes;
+    const totalReceivable = openInvoices.reduce((s, i) => s + (i.balance || 0), 0);
+
+    let recHtml = `<div class="stats-row"><div class="stat">
+      <div class="stat-number">${fmt(totalReceivable)}</div>
+      <div class="stat-label">Total Outstanding</div>
+    </div><div class="stat">
+      <div class="stat-number">${openInvoices.length}</div>
+      <div class="stat-label">Open Invoices</div>
+    </div></div>`;
+
+    if (openInvoices.length > 0) {
+      recHtml += `<table><thead><tr><th>Customer</th><th>Invoiced</th><th>Balance Due</th><th>Days Out</th></tr></thead><tbody>`;
+      openInvoices.sort((a, b) => new Date(a.issueDate) - new Date(b.issueDate));
+      openInvoices.forEach(inv => {
+        const name = inv.job?.location?.account?.name || '—';
+        const days = inv.issueDate ? Math.round((new Date() - new Date(inv.issueDate)) / (1000*60*60*24)) : null;
+        const daysClass = days > 30 ? 'warn' : 'ok';
+        recHtml += `<tr>
+          <td>${name}</td>
+          <td class="neutral">${fmt(inv.price)}</td>
+          <td>${fmt(inv.balance)}</td>
+          <td class="${daysClass}">${days !== null ? days + 'd' : '—'}</td>
+        </tr>`;
+      });
+      recHtml += `</tbody></table>`;
+    }
+    document.getElementById('receivables-area').innerHTML = recHtml;
+
+    // 2. Unbilled by active job
+    const jobsRes = await query({
+      organization: {
+        $: { id: ORG_ID },
+        jobs: {
+          $: { size: 100, where: { '=': [{ field: ['closedOn'] }, { value: null }] } },
+          nodes: {
+            id: {}, name: {},
+            location: { account: { name: {} } },
+            projectedPrice: {},
+            customFieldValues: { $: { size: 10 }, nodes: { customField: { id: {} }, value: {} } }
+          }
+        }
+      }
+    });
+
+    const inProdJobs = jobsRes.organization.jobs.nodes.filter(j => {
+      if (j.id === INTERNAL_JOB) return false;
+      const cfv = j.customFieldValues?.nodes || [];
+      const status = cfv.find(c => c.customField?.id === STATUS_CF)?.value;
+      return status === 'In Production';
+    });
+
+    // For each job get total invoiced
+    let unbilledRows = [];
+    for (const job of inProdJobs) {
+      const invRes = await query({
+        job: {
+          $: { id: job.id },
+          documents: {
+            $: { size: 50, where: { and: [
+              { '=': [{ field: ['type'] }, { value: 'customerInvoice' }] },
+              { '=': [{ field: ['status'] }, { value: 'approved' }] }
+            ]}},
+            nodes: { amountPaid: {}, price: {} }
+          }
+        }
+      });
+      const totalInvoiced = invRes.job.documents.nodes.reduce((s, i) => s + (i.price || 0), 0);
+      const unbilled = job.projectedPrice - totalInvoiced;
+      unbilledRows.push({
+        name: job.location?.account?.name || job.name,
+        contract: job.projectedPrice,
+        invoiced: totalInvoiced,
+        unbilled
+      });
+    }
+
+    unbilledRows.sort((a, b) => b.unbilled - a.unbilled);
+    const totalUnbilled = unbilledRows.reduce((s, r) => s + r.unbilled, 0);
+
+    let unbilledHtml = `<table><thead><tr><th>Job</th><th>Contract</th><th>Invoiced</th><th>Unbilled</th></tr></thead><tbody>`;
+    unbilledRows.forEach(r => {
+      unbilledHtml += `<tr>
+        <td>${r.name}</td>
+        <td class="neutral">${fmt(r.contract)}</td>
+        <td class="neutral">${fmt(r.invoiced)}</td>
+        <td class="${r.unbilled > 0 ? 'warn' : 'ok'}">${fmt(r.unbilled)}</td>
+      </tr>`;
+    });
+    unbilledHtml += `</tbody></table>`;
+    document.getElementById('unbilled-area').innerHTML = unbilledHtml;
+
+    // 3. Cash In vs Out by month YTD — paginate both
+    const monthsIn = Array(12).fill(0);
+    const monthsOut = Array(12).fill(0);
+    const monthsLabor = Array(12).fill(0);
+
+    // Cash in — paginate invoices
+    let page = null;
+    do {
+      const r = await query({
+        organization: {
+          $: { id: ORG_ID },
+          documents: {
+            $: { size: 100, ...(page ? { page } : {}), where: { and: [
+              { '=': [{ field: ['type'] }, { value: 'customerInvoice' }] },
+              { '=': [{ field: ['status'] }, { value: 'approved' }] },
+              { between: [{ field: ['closedAt'] }, [{ datetime: { startOf: 'year' } }, { datetime: { endOf: 'year' } }]] }
+            ]}},
+            nextPage: {},
+            nodes: { amountPaid: {}, closedAt: {} }
+          }
+        }
+      });
+      r.organization.documents.nodes.forEach(d => {
+        const m = new Date(d.closedAt).getMonth();
+        monthsIn[m] += d.amountPaid || 0;
+      });
+      page = r.organization.documents.nextPage || null;
+    } while (page);
+
+    // Cash out — paginate bills
+    page = null;
+    do {
+      const r = await query({
+        organization: {
+          $: { id: ORG_ID },
+          documents: {
+            $: { size: 100, ...(page ? { page } : {}), where: { and: [
+              { '=': [{ field: ['type'] }, { value: 'vendorBill' }] },
+              { '=': [{ field: ['status'] }, { value: 'approved' }] },
+              { between: [{ field: ['closedAt'] }, [{ datetime: { startOf: 'year' } }, { datetime: { endOf: 'year' } }]] }
+            ]}},
+            nextPage: {},
+            nodes: { amountPaid: {}, closedAt: {} }
+          }
+        }
+      });
+      r.organization.documents.nodes.forEach(d => {
+        const m = new Date(d.closedAt).getMonth();
+        monthsOut[m] += d.amountPaid || 0;
+      });
+      page = r.organization.documents.nextPage || null;
+    } while (page);
+
+    // Labor costs from time entries by month
+    page = null;
+    do {
+      const r = await query({
+        organization: {
+          $: { id: ORG_ID },
+          timeEntries: {
+            $: { size: 100, ...(page ? { page } : {}), where: {
+              between: [{ field: ['startedAt'] }, [{ datetime: { startOf: 'year' } }, { datetime: { endOf: 'year' } }]]
+            }},
+            nextPage: {},
+            nodes: { cost: {}, startedAt: {} }
+          }
+        }
+      });
+      r.organization.timeEntries.nodes.forEach(t => {
+        if (!t.startedAt) return;
+        const m = new Date(t.startedAt).getMonth();
+        monthsLabor[m] += t.cost || 0;
+      });
+      page = r.organization.timeEntries.nextPage || null;
+    } while (page);
+
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const currentMonth = new Date().getMonth();
+    const maxVal = Math.max(...monthsIn.slice(0, currentMonth+1), ...monthsOut.slice(0, currentMonth+1), ...monthsLabor.slice(0, currentMonth+1), 1);
+
+    let cashHtml = '';
+    for (let i = 0; i <= currentMonth; i++) {
+      const inPct = (monthsIn[i] / maxVal) * 100;
+      const outPct = (monthsOut[i] / maxVal) * 100;
+      const totalOut = monthsOut[i] + monthsLabor[i];
+      const billsPct = (monthsOut[i] / maxVal) * 100;
+      const laborPct = (monthsLabor[i] / maxVal) * 100;
+      cashHtml += `<div class="bar-row">
+        <div class="bar-label">${months[i]}</div>
+        <div class="bar-group">
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(inPct,1)}%;background:#27ae60"><span>${fmt(monthsIn[i])}</span></div></div>
+          <div class="bar-track" style="display:flex;overflow:hidden;border-radius:3px">
+            <div style="width:${billsPct}%;background:#c0392b;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:10px;color:#fff;white-space:nowrap;overflow:hidden">${monthsOut[i] > 5000 ? fmt(monthsOut[i]) : ''}</span></div>
+            <div style="width:${laborPct}%;background:#e67e22;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:10px;color:#fff;white-space:nowrap;overflow:hidden">${monthsLabor[i] > 5000 ? fmt(monthsLabor[i]) : ''}</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#555;white-space:nowrap;padding-left:6px">${fmt(totalOut)}</div>
+      </div>`;
+    }
+    document.getElementById('cashflow-chart').innerHTML = cashHtml;
+
+    const now = new Date();
+    document.getElementById('last-updated').textContent = `Updated ${now.toLocaleTimeString()}`;
+    document.getElementById('report-status').textContent = 'Loaded';
+
+  } catch(err) {
+    document.getElementById('report-status').textContent = `Error: ${err.message}`;
+    console.error(err);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', loadReport);
+setInterval(loadReport, 60 * 60 * 1000);
+</script>
+</body>
+</html>
