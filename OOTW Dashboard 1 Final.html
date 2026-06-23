@@ -36,7 +36,7 @@
   /* Pipeline bars — taller, more visual */
   .pl-chart { padding: 14px 16px; }
   .pl-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .pl-label { font-size: 11px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; }
+  .pl-label { font-size: 11px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; font-size:13px; }
   .pl-track { flex: 1; background: #222; border-radius: 6px; height: 28px; overflow: hidden; }
   .pl-fill { height: 28px; border-radius: 6px; background: #fff; display: flex; align-items: center; padding-left: 10px; min-width: 32px; transition: width 0.5s ease; }
   .pl-fill span { font-size: 13px; color: #000; font-weight: 600; }
@@ -44,16 +44,16 @@
   /* Pie */
   .pie-wrap { padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
   .legend { display: flex; flex-direction: column; gap: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .legend-value { font-weight: 700; margin-left: auto; padding-left: 12px; font-size: 15px; }
 
   /* Tables */
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  thead th { padding: 8px 10px; text-align: right; font-weight: 600; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #2a2a2a; background: #222; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 8px 10px; text-align: right; font-weight: 600; color: #bbb; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #2a2a2a; background: #222; }
   thead th:first-child { text-align: left; }
   td { padding: 9px 10px; text-align: right; border-bottom: 1px solid #222; vertical-align: middle; }
-  td:first-child { text-align: left; font-weight: 500; color: #fff; }
+  td:first-child { text-align: left; font-weight: 500; color: #fff; font-size:13px; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #222; }
 
@@ -70,21 +70,21 @@
 
   /* Tabs */
   .tabs { display: flex; gap: 0; padding: 0 16px; margin-bottom: -1px; }
-  .tab { padding: 7px 18px; font-size: 12px; cursor: pointer; border: 1px solid #2a2a2a; border-bottom: none; border-radius: 6px 6px 0 0; background: #111; color: #999; font-family: inherit; }
+  .tab { padding: 7px 18px; font-size: 12px; cursor: pointer; border: 1px solid #2a2a2a; border-bottom: none; border-radius: 6px 6px 0 0; background: #111; color: #aaa; font-family: inherit; }
   .tab.active { background: #1a1a1a; color: #fff; font-weight: 600; border-bottom: 1px solid #1a1a1a; }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
   /* Cash flow */
   .cf-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-  .cf-label { font-size: 11px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; }
+  .cf-label { font-size: 11px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; font-size:13px; }
   .cf-group { flex: 1; display: flex; flex-direction: column; gap: 3px; }
   .cf-track { background: #222; border-radius: 3px; height: 14px; overflow: hidden; }
   .cf-fill { height: 14px; border-radius: 3px; display: flex; align-items: center; padding: 0 6px; min-width: 3px; }
   .cf-fill span { font-size: 10px; color: #fff; font-weight: 600; white-space: nowrap; overflow: hidden; }
   .cf-total { font-size: 11px; color: #555; white-space: nowrap; padding-left: 6px; font-weight: 500; min-width: 80px; text-align: right; }
   .bar-legend { display: flex; gap: 14px; padding: 6px 16px 14px; }
-  .bar-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #aaa; }
+  .bar-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #bbb; }
   .bar-legend-dot { width: 9px; height: 9px; border-radius: 2px; }
 
   /* Financial stats */
@@ -92,7 +92,7 @@
   .fin-stat { padding: 16px 20px; border-right: 1px solid #2a2a2a; }
   .fin-stat:last-child { border-right: none; }
   .fin-stat-num { font-size: 28px; font-weight: 200; color: #fff; }
-  .fin-stat-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+  .fin-stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
 
   .loading { padding: 30px; text-align: center; color: #bbb; font-size: 13px; }
   .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; vertical-align: middle; }
@@ -112,24 +112,35 @@
 <!-- ═══ PIPELINE ═══ -->
 <div class="section">
   <div class="section-title">Pipeline</div>
-  <div class="grid" style="grid-template-columns: 2fr 1fr 1fr 1fr">
-    <div class="card">
-      <div class="card-head"><h2>New Leads per Month (YTD)</h2><span class="status" id="s-leads"></span></div>
-      <div class="pl-chart" id="leads-chart"><div class="loading"><span class="spinner"></span></div></div>
+  <div class="grid" style="grid-template-columns: 2fr 2fr 1fr 1fr">
+    <div class="card" style="grid-column:span 2">
+      <div class="card-head"><h2>New Leads &amp; Active Pipeline</h2><span class="status" id="s-leads"></span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid #2a2a2a">
+        <div style="border-right:1px solid #2a2a2a">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#bbb;padding:10px 16px 6px">Leads per Month (YTD)</div>
+          <div class="pl-chart" id="leads-chart"><div class="loading"><span class="spinner"></span></div></div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#bbb;padding:10px 16px 6px">Active Pipeline by Stage</div>
+          <div class="pl-chart" id="funnel-chart"><div class="loading"><span class="spinner"></span></div></div>
+        </div>
+      </div>
     </div>
     <div class="card">
       <div class="card-head"><h2>Won vs Lost (YTD)</h2></div>
       <div class="pie-wrap" id="wonlost-chart"><div class="loading"><span class="spinner"></span></div></div>
     </div>
-    <div class="card stat-card">
-      <div class="stat-card-value" id="win-rate-val">—</div>
-      <div class="stat-card-label">Win Rate</div>
-      <div class="stat-card-sub" id="win-rate-sub"></div>
-    </div>
-    <div class="card stat-card">
-      <div class="stat-card-value" id="avg-days-val">—</div>
-      <div class="stat-card-label">Avg Days to Close</div>
-      <div class="stat-card-sub" id="avg-days-sub"></div>
+    <div class="card" style="display:grid;grid-template-rows:1fr 1fr">
+      <div class="stat-card" style="border-bottom:1px solid #2a2a2a">
+        <div class="stat-card-value" style="font-size:38px" id="win-rate-val">—</div>
+        <div class="stat-card-label">Win Rate</div>
+        <div class="stat-card-sub" id="win-rate-sub"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" style="font-size:38px" id="avg-days-val">—</div>
+        <div class="stat-card-label">Avg Days to Close</div>
+        <div class="stat-card-sub" id="avg-days-sub"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -189,7 +200,7 @@
   <div class="grid" style="grid-template-columns:1fr">
     <div class="card">
       <div class="card-head"><h2>Cash In vs Out — YTD</h2></div>
-      <div style="padding:4px 16px 0;font-size:10px;color:#888">Labor from JT time entries at burdened rates. Payroll taxes & overhead not included.</div>
+      <div style="padding:4px 16px 0;font-size:11px;color:#999">Labor from JT time entries at burdened rates. Payroll taxes & overhead not included.</div>
       <div class="bar-legend">
         <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#27ae60"></div>Cash In (Invoices)</div>
         <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#c0392b"></div>Direct Job Costs (Bills + Labor)</div>
@@ -213,6 +224,21 @@ const INTERNAL_JOB = '22PRPSP7jMP2';
 const LC_IDS = new Set(['22PKqY8AD7gA','22PHbqmsSWV3','22PLzQjq9Lnm','22PXzZvkvr8v']);
 const STAFF_IDS = new Set(['22PWrLmyK4z3']);
 const APP_IDS = new Set(['22PRPkkDd3WX']);
+
+const FUNNEL_STAGES = [
+  { label: 'New Lead',             key: 'New Lead',                     color: '#555' },
+  { label: 'Waiting — ILM',        key: 'Waiting To Schedule ILM',      color: '#666' },
+  { label: 'ILM Scheduled',        key: 'ILM Scheduled',                color: '#777' },
+  { label: 'Waiting — ISV',        key: 'Waiting To Schedule ISV',      color: '#888' },
+  { label: 'ISV Scheduled',        key: 'ISV Scheduled',                color: '#888' },
+  { label: 'ISV Complete',         key: 'ISV Complete',                 color: '#2980b9' },
+  { label: 'Feasibility Approved', key: 'Feasibility Approved',         color: '#2980b9' },
+  { label: 'Brown Bag Given',      key: 'Brown Bag Given',              color: '#8e44ad' },
+  { label: 'DA Signed & Paid',     key: 'DA Signed and Paid',           color: '#e67e22' },
+  { label: 'Contract Signed',      key: 'Contract Signed, Not Started', color: '#27ae60' },
+  { label: 'Poke One More Time',   key: 'Poke One More Time',           color: '#444' },
+];
+
 const WON_STATUSES = new Set(['Contract Signed, Not Started','In Production','Job Complete']);
 const LOST_STATUSES = new Set(['Lost - after ILM, before brown bag','Lost - after brown bag, before DA','Lost - during design','OOTW Dropped','Client Postponed']);
 
@@ -269,6 +295,25 @@ async function loadPipeline() {
       leadsHtml += `<div class="pl-row"><div class="pl-label">${months[i]}</div><div class="pl-track"><div class="pl-fill" style="width:${Math.max(pct,6)}%"><span>${monthCounts[i]}</span></div></div></div>`;
     }
     document.getElementById('leads-chart').innerHTML = leadsHtml;
+
+    // Funnel — count active pipeline by stage
+    const stageCounts = {};
+    jobs.forEach(j => {
+      const st = getCFValue(j, STATUS_CF);
+      if (st) stageCounts[st] = (stageCounts[st] || 0) + 1;
+    });
+    const funnelStages = FUNNEL_STAGES.filter(s => stageCounts[s.key] > 0);
+    const maxStage = Math.max(...funnelStages.map(s => stageCounts[s.key] || 0), 1);
+    let funnelHtml = '';
+    funnelStages.forEach(s => {
+      const count = stageCounts[s.key] || 0;
+      const pct = (count / maxStage) * 100;
+      funnelHtml += `<div class="pl-row">
+        <div class="pl-label" style="width:110px;font-size:11px;color:#ccc">${s.label}</div>
+        <div class="pl-track"><div class="pl-fill" style="width:${Math.max(pct,6)}%;background:${s.color}"><span>${count}</span></div></div>
+      </div>`;
+    });
+    document.getElementById('funnel-chart').innerHTML = funnelHtml;
 
     let won=0, lost=0;
     const wonJobs=[];
