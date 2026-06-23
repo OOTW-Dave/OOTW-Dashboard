@@ -166,7 +166,7 @@ async function loadReport() {
         jobs: {
           $: { size: 50, where: { '=': [{ field: ['closedOn'] }, { value: null }] } },
           nodes: {
-            id: {}, name: {},
+            id: {}, name: {}, location: { account: { name: {} } },
             customFieldValues: { $: { size: 5 }, nodes: { customField: { id: {} }, value: {} } }
           }
         }
@@ -291,7 +291,8 @@ async function loadReport() {
         tePage = teRes.job.timeEntries?.nextPage || null;
       } while (tePage);
 
-      jobData.push({ name: job.name, budgeted, actual, hoursB, hoursA });
+      const displayName = job.location?.account?.name || job.name;
+      jobData.push({ name: displayName, budgeted, actual, hoursB, hoursA });
     }
 
     renderReport(jobData);
@@ -344,10 +345,9 @@ function renderReport(jobs) {
     const totalA = (a.LC||0) + (a.Staff||0) + (a.Apprentice||0) + (a.Other||0);
     const p = pct(totalA, totalB);
     const isOver = totalA > totalB * 1.05;
-    const badge = totalB > 0 ? `<span class="badge ${isOver ? 'badge-over' : 'badge-ok'}">${isOver ? '▲ over' : '✓ ok'}</span>` : '';
 
     html += `<tr>
-      <td>${job.name}${badge}</td>
+      <td>${job.name}</td>
       <td class="neutral">${b.LC ? fmt(b.LC) : '—'}</td>
       <td class="${a.LC > b.LC * 1.05 ? 'over' : a.LC > 0 ? 'ok' : 'neutral'}">${a.LC ? fmt(a.LC) : '—'}</td>
       <td class="neutral">${b.Staff ? fmt(b.Staff) : '—'}</td>
@@ -363,21 +363,7 @@ function renderReport(jobs) {
     </tr>`;
   });
 
-  html += `</tbody>
-    <tfoot>
-      <tr class="totals-row">
-        <td>Total</td>
-        <td>${fmt(totB.LC)}</td><td class="${totA.LC > totB.LC*1.05 ? 'over':'ok'}">${fmt(totA.LC)}</td>
-        <td>${fmt(totB.Staff)}</td><td class="${totA.Staff > totB.Staff*1.05 ? 'over':'ok'}">${fmt(totA.Staff)}</td>
-        <td>${fmt(totB.Apprentice)}</td><td class="${totA.Apprentice > totB.Apprentice*1.05 ? 'over':'ok'}">${fmt(totA.Apprentice)}</td>
-        <td>${fmt(totB.Other||0)}</td><td class="${(totA.Other||0) > (totB.Other||0)*1.05 ? 'over':'ok'}">${fmt(totA.Other||0)}</td>
-        <td>${fmt(grandB)}</td>
-        <td class="${grandA > grandB ? 'over':'ok'}">${fmt(grandA)}</td>
-        <td class="${grandB - grandA < 0 ? 'over' : grandB - grandA < grandB * 0.15 ? 'warn' : 'ok'}">${fmt(grandB - grandA)}</td>
-        <td class="${pctClass(grandPct)}">${grandPct !== null ? grandPct+'%' : '—'}</td>
-      </tr>
-    </tfoot>
-  </table>`;
+  html += `</tbody></table>`;
 
   document.getElementById('table-area').innerHTML = html;
 }
@@ -436,24 +422,13 @@ function renderHours(jobs) {
     </tr>`;
   });
 
-  html += `</tbody>
-    <tfoot>
-      <tr class="totals-row">
-        <td>Total</td>
-        <td>${fmtH(totB.LC)}</td><td class="${pctClass(pct(totA.LC,totB.LC))}">${fmtH(totA.LC)}</td><td class="${pctClass(pct(totA.LC,totB.LC))}">${pct(totA.LC,totB.LC) !== null ? pct(totA.LC,totB.LC)+'%' : '—'}</td>
-        <td>${fmtH(totB.Staff)}</td><td class="${pctClass(pct(totA.Staff,totB.Staff))}">${fmtH(totA.Staff)}</td><td class="${pctClass(pct(totA.Staff,totB.Staff))}">${pct(totA.Staff,totB.Staff) !== null ? pct(totA.Staff,totB.Staff)+'%' : '—'}</td>
-        <td>${fmtH(totB.Apprentice)}</td><td class="${pctClass(pct(totA.Apprentice,totB.Apprentice))}">${fmtH(totA.Apprentice)}</td><td class="${pctClass(pct(totA.Apprentice,totB.Apprentice))}">${pct(totA.Apprentice,totB.Apprentice) !== null ? pct(totA.Apprentice,totB.Apprentice)+'%' : '—'}</td>
-        <td>${fmtH(grandB)}</td>
-        <td class="${pctClass(pct(grandA,grandB))}">${fmtH(grandA)}</td>
-        <td class="${pctClass(pct(grandA,grandB))}">${pct(grandA,grandB) !== null ? pct(grandA,grandB)+'%' : '—'}</td>
-      </tr>
-    </tfoot>
-  </table>`;
+  html += `</tbody></table>`;
 
   document.getElementById('hours-area').innerHTML = html;
 }
 
 window.addEventListener("DOMContentLoaded", loadReport);
+setInterval(loadReport, 60 * 60 * 1000); // Auto-refresh every hour
 </script>
 </body>
 </html>
