@@ -543,7 +543,7 @@ async function loadFinancial() {
     ubHtml+='</tbody></table>';
     document.getElementById('unbilled-area').innerHTML=ubHtml;
 
-    const mIn=Array(12).fill(0),mOut=Array(12).fill(0),mLab=Array(12).fill(0);
+    const mIn=Array(12).fill(0),mOut=Array(12).fill(0),mLab=Array(12).fill(0),mOvh=Array(12).fill(0);
     let pg=null;
     do{const r=await query({organization:{$:{id:ORG_ID},documents:{$:{size:100,...(pg?{page:pg}:{}),where:{and:[{'=':[{field:['type']},{value:'customerInvoice'}]},{'=':[{field:['status']},{value:'approved'}]},{between:[{field:['closedAt']},[{datetime:{startOf:'year'}},{datetime:{endOf:'year'}}]]}]}},nextPage:{},nodes:{amountPaid:{},closedAt:{}}}}});
     r.organization.documents.nodes.forEach(d=>{const m=new Date(d.closedAt).getMonth();mIn[m]+=d.amountPaid||0;});pg=r.organization.documents.nextPage||null;}while(pg);
@@ -554,17 +554,24 @@ async function loadFinancial() {
     do{const r=await query({organization:{$:{id:ORG_ID},timeEntries:{$:{size:100,...(pg?{page:pg}:{}),where:{between:[{field:['startedAt']},[{datetime:{startOf:'year'}},{datetime:{endOf:'year'}}]]}},nextPage:{},nodes:{cost:{},startedAt:{}}}}});
     r.organization.timeEntries.nodes.forEach(t=>{if(!t.startedAt)return;const m=new Date(t.startedAt).getMonth();mLab[m]+=t.cost||0;});pg=r.organization.timeEntries.nextPage||null;}while(pg);
 
+    // Fetch live overhead data from QBO server
+    try {
+      const qboRes=await fetch('https://ootwdashboard.synology.me:8888/qbo-data',{headers:{'X-Dashboard-Key':'fb71o0mugMZMzBLtzet76Q7Wh1UBVSki1iFRLRal'}});
+      if(qboRes.ok){const qboData=await qboRes.json();qboData.months.forEach((m,i)=>{mOvh[i]=(m.overhead||0)+(m.payroll||0)+(m.qbFees||0);});}
+    } catch(e){console.warn('QBO fetch failed',e);}
+
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const cm=new Date().getMonth();
-    const maxV=Math.max(...mIn.slice(0,cm+1),...mOut.slice(0,cm+1),...mLab.slice(0,cm+1),1);
+    const maxV=Math.max(...mIn.slice(0,cm+1),...mOut.slice(0,cm+1),...mLab.slice(0,cm+1),...mOvh.slice(0,cm+1),1);
     let cfHtml='';
     for(let i=0;i<=cm;i++){
-      const ip=(mIn[i]/maxV)*100,bp=(mOut[i]/maxV)*100,lp=(mLab[i]/maxV)*100,tot=mOut[i]+mLab[i];
+      const ip=(mIn[i]/maxV)*100,bp=(mOut[i]/maxV)*100,lp=(mLab[i]/maxV)*100,op=(mOvh[i]/maxV)*100,tot=mOut[i]+mLab[i]+mOvh[i];
       cfHtml+=`<div class="cf-row"><div class="cf-label">${months[i]}</div><div class="cf-group">
         <div class="cf-track"><div class="cf-fill" style="width:${Math.max(ip,1)}%;background:#27ae60"><span>${fmt(mIn[i])}</span></div></div>
         <div class="cf-track" style="display:flex;overflow:hidden;border-radius:2px">
           <div style="width:${bp}%;background:#c0392b;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:9px;color:#fff;white-space:nowrap;overflow:hidden">${mOut[i]>5000?fmt(mOut[i]):''}</span></div>
           <div style="width:${lp}%;background:#e67e22;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:9px;color:#fff;white-space:nowrap;overflow:hidden">${mLab[i]>5000?fmt(mLab[i]):''}</span></div>
+          <div style="width:${op}%;background:#8e44ad;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:9px;color:#fff;white-space:nowrap;overflow:hidden">${mOvh[i]>5000?fmt(mOvh[i]):''}</span></div>
         </div>
       </div><div class="cf-total">${fmt(tot)}</div></div>`;
     }
@@ -572,17 +579,3 @@ async function loadFinancial() {
     document.getElementById('s-fin').textContent='Loaded';
   } catch(e){document.getElementById('s-fin').textContent=`Error: ${e.message}`;}
 }
-
-async function loadAll() {
-  document.getElementById('last-updated').textContent='Refreshing...';
-  await Promise.all([loadPipeline(), loadGP()]);
-  await loadLabor();
-  await loadFinancial();
-  document.getElementById('last-updated').textContent=`Updated ${new Date().toLocaleTimeString()}`;
-}
-
-window.addEventListener('DOMContentLoaded', loadAll);
-setInterval(loadAll, 60*60*1000);
-</script>
-</body>
-</html>
