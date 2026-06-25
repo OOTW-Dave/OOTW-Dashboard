@@ -579,3 +579,16 @@ async function loadFinancial() {
     document.getElementById('s-fin').textContent='Loaded';
   } catch(e){document.getElementById('s-fin').textContent=`Error: ${e.message}`;}
 }
+ async function loadAll() {
+  document.getElementById('last-updated').textContent='Refreshing...';
+  await Promise.all([loadPipeline(), loadGP()]);
+  await loadLabor();
+  await loadFinancial();
+  document.getElementById('last-updated').textContent=`Updated ${new Date().toLocaleTimeString()}`;
+}
+
+window.addEventListener('DOMContentLoaded', loadAll);
+setInterval(loadAll, 60*60*1000);
+</script>
+</body>
+</html>
