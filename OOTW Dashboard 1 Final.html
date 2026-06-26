@@ -519,29 +519,114 @@ async function loadLabor() {
   } catch(e){document.getElementById('s-labor').textContent=`Error: ${e.message}`;}
 }
 // ─── CLOSING PIPELINE ────────────────────────────────────────────────────────
+// Replace the entire loadClosingPipeline() function with this:
+
 async function loadClosingPipeline() {
   document.getElementById('s-closing').textContent='Loading...';
   try {
-    const res=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100,where:{'=':[{field:['closedOn']},{value:null}]}},nodes:{id:{},name:{},projectedPrice:{},location:{account:{name:{}}},customFieldValues:{$:{size:10},nodes:{customField:{id:{}},value:{}}}}}}});
+    // Step 1: Get all open jobs with their pipeline stage
+    const res=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100,where:{'=':[{field:['closedOn']},{value:null}]}},nodes:{id:{},name:{},location:{account:{name:{}}},customFieldValues:{$:{size:10},nodes:{customField:{id:{}},value:{}}}}}}});
     const jobs=res.organization.jobs.nodes;
+    const stageKeys=new Set(CLOSING_STAGES.map(s=>s.key));
+
+    // Filter to only closing pipeline jobs
+    const closingJobs=jobs
+      .filter(job=>{
+        if(job.id===INTERNAL_JOB)return false;
+        const status=job.customFieldValues?.nodes?.find(c=>c.customField?.id===STATUS_CF)?.value;
+        return stageKeys.has(status);
+      })
+      .map(job=>({
+        id:job.id,
+        name:job.location?.account?.name||job.name,
+        stage:job.customFieldValues?.nodes?.find(c=>c.customField?.id===STATUS_CF)?.value
+      }));
+
+    // Step 2: For each closing job, fetch budget data and apply stage logic
     const buckets={};
     CLOSING_STAGES.forEach(s=>{buckets[s.key]={total:0,count:0};});
-    jobs.forEach(job=>{
-      const sv=job.customFieldValues?.nodes?.find(c=>c.customField?.id===STATUS_CF)?.value;
-      if(sv&&buckets[sv]!==undefined){buckets[sv].total+=job.projectedPrice||0;buckets[sv].count++;}
-    });
+
+    for(const job of closingJobs){
+      // Fetch cost groups, total cost items, and document data in one call
+      const budgetRes=await query({
+        job:{
+          $:{id:job.id},
+          costGroups:{$:{size:50,where:[['document','id'],null]},nodes:{id:{},name:{}}},
+          costItems:{sum:{$:'price'}},
+          documents:{$:{size:10,where:{and:[['type','customerOrder'],['status','approved']]}},nodes:{costItems:{sum:{$:'price'}},name:{},price:{}}}
+        }
+      });
+
+      const jobData=budgetRes.job;
+      const jobLevelGroups=jobData.costGroups?.nodes||[];
+      const totalAllCostItems=jobData.costItems?.sum||0;
+      const docs=jobData.documents?.nodes||[];
+      const totalDocCostItems=docs.reduce((s,d)=>s+(d.costItems?.sum||0),0);
+      const largestDocPrice=docs.reduce((max,d)=>Math.max(max,d.price||0),0);
+
+      let value=0;
+
+      if(job.stage==='DA Signed and Paid'){
+        // Find "Contract Budget" parent group
+        const cbIdx=jobLevelGroups.findIndex(g=>g.name==='Contract Budget');
+
+        if(cbIdx>=0){
+          // CASE 1: Explicit "Contract Budget" group exists
+          // Child groups are those listed AFTER the parent in the returned list
+          const childGroupIds=jobLevelGroups.slice(cbIdx+1).map(g=>g.id);
+
+          if(childGroupIds.length>0){
+            // Sum cost items from all child groups
+            const orFilter=childGroupIds.map(id=>[['costGroup','id'],id]);
+            const childRes=await query({
+              job:{
+                $:{id:job.id},
+                costItems:{$:{size:100,where:{or:orFilter}},sum:{$:'price'}}
+              }
+            });
+            value=childRes.job.costItems?.sum||0;
+          } else {
+            value=largestDocPrice; // fallback
+          }
+
+        } else {
+          // CASE 2: No explicit group — derive from job-level items
+          const contractBudget=totalAllCostItems-totalDocCostItems;
+          if(contractBudget>10000){
+            // Job-level cost items exist → use derived contract budget
+            value=contractBudget;
+          } else {
+            // CASE 3: No job-level items either → use largest document price
+            value=largestDocPrice;
+          }
+        }
+
+      } else {
+        // All other stages (DA Presented, Proposal Presented/Revisions, Contract Signed)
+        // Use the largest approved customer order document price
+        value=largestDocPrice;
+      }
+
+      buckets[job.stage].total+=value;
+      buckets[job.stage].count++;
+    }
+
+    // Render the tile
     const grandTotal=CLOSING_STAGES.reduce((s,st)=>s+buckets[st.key].total,0);
     const grandCount=CLOSING_STAGES.reduce((s,st)=>s+buckets[st.key].count,0);
     const maxVal=Math.max(...CLOSING_STAGES.map(s=>buckets[s.key].total),1);
+
     if(grandCount===0){
       document.getElementById('closing-pipeline-area').innerHTML='<div style="color:#888;text-align:center;padding:20px">No active deals in closing stages</div>';
       document.getElementById('s-closing').textContent='Loaded';
       return;
     }
+
     let html=`<div class="fin-stats" style="margin-bottom:12px">
       <div class="fin-stat"><div class="fin-stat-num">${fmt(grandTotal)}</div><div class="fin-stat-label">Total Pipeline</div></div>
       <div class="fin-stat"><div class="fin-stat-num">${grandCount}</div><div class="fin-stat-label">Active Deals</div></div>
     </div>`;
+
     CLOSING_STAGES.forEach(stage=>{
       const b=buckets[stage.key];
       if(b.count===0)return;
@@ -558,6 +643,7 @@ async function loadClosingPipeline() {
         <div class="cf-total" style="font-size:10px;color:#888">${b.count} job${b.count!==1?'s':''}</div>
       </div>`;
     });
+
     document.getElementById('closing-pipeline-area').innerHTML=html;
     document.getElementById('s-closing').textContent='Loaded';
   } catch(e){document.getElementById('s-closing').textContent=`Error: ${e.message}`;}
