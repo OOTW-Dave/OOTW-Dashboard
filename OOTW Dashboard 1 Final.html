@@ -191,9 +191,9 @@
 <!-- ═══ FINANCIAL ═══ -->
 <div class="section">
   <div class="section-title">Financial</div>
-  <div class="grid" style="grid-template-columns:1fr 1fr">
+  <div class="grid grid-2">
     <div class="card">
-      <div class="card-head"><h2>Receivables & Unbilled</h2><span class="status" id="s-fin"></span></div>
+      <div class="card-head"><h2>Receivables &amp; Unbilled</h2><span class="status" id="s-fin"></span></div>
       <div id="receivables-area"><div class="loading"><span class="spinner"></span></div></div>
     </div>
     <div class="card">
@@ -201,20 +201,28 @@
       <div id="unbilled-area"><div class="loading"><span class="spinner"></span></div></div>
     </div>
   </div>
-  <div style="height:14px"></div>
-  <div class="grid" style="grid-template-columns:1fr">
+  <div style="height:16px"></div>
+  <div class="grid grid-1">
+    <div class="card">
+      <div class="card-head"><h2>Closing Pipeline</h2><span class="status" id="s-closing"></span></div>
+      <div id="closing-pipeline-area"><div class="loading"><span class="spinner"></span></div></div>
+    </div>
+  </div>
+  <div style="height:16px"></div>
+  <div class="grid grid-1">
     <div class="card">
       <div class="card-head"><h2>Cash In vs Out — YTD</h2></div>
-      <div style="padding:4px 16px 0;font-size:11px;color:#999">Labor from JT time entries at burdened rates. Payroll taxes & overhead not included.</div>
-      <div class="bar-legend">
-        <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#27ae60"></div>Cash In (Invoices)</div>
-        <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#c0392b"></div>Direct Job Costs (Bills + Labor)</div>
-        <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#8e44ad"></div>Overhead (Salaries + Expenses)</div>
+      <div style="padding:6px 16px 0;font-size:10px;color:#aaa">Labor from JT time entries at burdened rates. Payroll taxes &amp; overhead not included.</div>
+      <div style="padding:6px 16px 8px;display:flex;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px"><div style="width:10px;height:10px;background:#27ae60;border-radius:2px"></div>Cash In (Invoices)</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px"><div style="width:10px;height:10px;background:#c0392b;border-radius:2px"></div>Direct Job Costs (Bills + Labor)</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px"><div style="width:10px;height:10px;background:#8e44ad;border-radius:2px"></div>Overhead (Salaries + Expenses)</div>
       </div>
-      <div class="pl-chart" id="cashflow-chart"><div class="loading"><span class="spinner"></span></div></div>
+      <div id="cashflow-chart"><div class="loading"><span class="spinner"></span></div></div>
     </div>
   </div>
 </div>
+
 
 <div class="spacer"></div>
 
@@ -226,6 +234,14 @@ const OUTCOME_DATE_CF = '22PYznLnyz9R';
 const LABOR_TYPE_ID = '22PEnmvkyEJ2';
 const GRANT_KEY = '22TSP4tXi4XtJCf3kydhJhLCjXytzHFeBm';
 const INTERNAL_JOB = '22PRPSP7jMP2';
+const CLOSING_STAGES = [
+  { key: 'Feasibility Approved',         label: 'Feasibility Approved',         color: '#3498db' },
+  { key: 'DA Presented',                 label: 'DA Presented',                 color: '#9b59b6' },
+  { key: 'DA Signed and Paid',           label: 'DA Signed and Paid',           color: '#e67e22' },
+  { key: 'Proposal Presented',           label: 'Proposal Presented',           color: '#e74c3c' },
+  { key: 'Proposal Revisions',           label: 'Proposal Revisions',           color: '#c0392b' },
+  { key: 'Contract Signed, Not Started', label: 'Contract Signed, Not Started', color: '#27ae60' },
+];
 const LC_IDS = new Set(['22PKqY8AD7gA','22PHbqmsSWV3','22PLzQjq9Lnm','22PXzZvkvr8v']);
 const STAFF_IDS = new Set(['22PWrLmyK4z3']);
 const APP_IDS = new Set(['22PRPkkDd3WX']);
@@ -502,7 +518,50 @@ async function loadLabor() {
     document.getElementById('s-labor').textContent=`${jobData.length} jobs`;
   } catch(e){document.getElementById('s-labor').textContent=`Error: ${e.message}`;}
 }
-
+// ─── CLOSING PIPELINE ────────────────────────────────────────────────────────
+async function loadClosingPipeline() {
+  document.getElementById('s-closing').textContent='Loading...';
+  try {
+    const res=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100,where:{'=':[{field:['closedOn']},{value:null}]}},nodes:{id:{},name:{},projectedPrice:{},location:{account:{name:{}}},customFieldValues:{$:{size:10},nodes:{customField:{id:{}},value:{}}}}}}});
+    const jobs=res.data.organization.jobs.nodes;
+    const buckets={};
+    CLOSING_STAGES.forEach(s=>{buckets[s.key]={total:0,count:0};});
+    jobs.forEach(job=>{
+      const sv=job.customFieldValues?.nodes?.find(c=>c.customField?.id===STATUS_CF)?.value;
+      if(sv&&buckets[sv]!==undefined){buckets[sv].total+=job.projectedPrice||0;buckets[sv].count++;}
+    });
+    const grandTotal=CLOSING_STAGES.reduce((s,st)=>s+buckets[st.key].total,0);
+    const grandCount=CLOSING_STAGES.reduce((s,st)=>s+buckets[st.key].count,0);
+    const maxVal=Math.max(...CLOSING_STAGES.map(s=>buckets[s.key].total),1);
+    if(grandCount===0){
+      document.getElementById('closing-pipeline-area').innerHTML='<div style="color:#888;text-align:center;padding:20px">No active deals in closing stages</div>';
+      document.getElementById('s-closing').textContent='Loaded';
+      return;
+    }
+    let html=`<div class="fin-stats" style="margin-bottom:12px">
+      <div class="fin-stat"><div class="fin-stat-num">${fmt(grandTotal)}</div><div class="fin-stat-label">Total Pipeline</div></div>
+      <div class="fin-stat"><div class="fin-stat-num">${grandCount}</div><div class="fin-stat-label">Active Deals</div></div>
+    </div>`;
+    CLOSING_STAGES.forEach(stage=>{
+      const b=buckets[stage.key];
+      if(b.count===0)return;
+      const pct=Math.max((b.total/maxVal)*100,2);
+      html+=`<div class="cf-row">
+        <div class="cf-label" style="width:170px;font-size:10px">${stage.label}</div>
+        <div class="cf-group" style="flex:1">
+          <div class="cf-track">
+            <div class="cf-fill" style="width:${pct}%;background:${stage.color}">
+              <span>${fmt(b.total)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="cf-total" style="font-size:10px;color:#888">${b.count} job${b.count!==1?'s':''}</div>
+      </div>`;
+    });
+    document.getElementById('closing-pipeline-area').innerHTML=html;
+    document.getElementById('s-closing').textContent='Loaded';
+  } catch(e){document.getElementById('s-closing').textContent=`Error: ${e.message}`;}
+}
 // ─── FINANCIAL ───────────────────────────────────────────────────────────────
 async function loadFinancial() {
   document.getElementById('s-fin').textContent='Loading...';
@@ -579,11 +638,14 @@ async function loadFinancial() {
     document.getElementById('s-fin').textContent='Loaded';
   } catch(e){document.getElementById('s-fin').textContent=`Error: ${e.message}`;}
 }
+
+  
  async function loadAll() {
   document.getElementById('last-updated').textContent='Refreshing...';
   await Promise.all([loadPipeline(), loadGP()]);
   await loadLabor();
   await loadFinancial();
+  await loadClosingPipeline();
   document.getElementById('last-updated').textContent=`Updated ${new Date().toLocaleTimeString()}`;
 }
 
