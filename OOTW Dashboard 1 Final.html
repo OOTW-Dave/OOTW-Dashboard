@@ -780,7 +780,7 @@ async function loadRevenueGoal() {
     const annualPace=Math.round((ytdRevenue/(cm+1))*12);
     const ytdPct=Math.min(Math.round((ytdRevenue/ytdGoal)*100),999);
     const maxBar=Math.max(...mIn.slice(0,cm+1),REVENUE_GOAL_MONTHLY*1.2,1);
-    const chartH=120;
+    const chartH=180;
     const goalY=100-((REVENUE_GOAL_MONTHLY/maxBar)*100);
 
     let html=`<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333">
@@ -791,7 +791,7 @@ async function loadRevenueGoal() {
       <div class="fin-stat"><div class="fin-stat-num">${fmt(REVENUE_GOAL_MONTHLY*12)}</div><div class="fin-stat-label">Annual Goal</div></div>
     </div>`;
 
-    html+=`<div style="display:flex;gap:8px">
+    html+=`<div style="display:flex;gap:8px;padding:0 16px">
       <div style="width:44px;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:4px;padding-bottom:18px">
         <span style="font-size:9px;color:#666">${fmt(Math.round(maxBar/1000)*1000)}</span>
         <span style="font-size:9px;color:#e67e22">${fmt(REVENUE_GOAL_MONTHLY)}</span>
