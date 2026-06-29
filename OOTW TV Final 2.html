@@ -8,8 +8,6 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:#111;color:#ddd;font-family:'Arial',sans-serif;height:100vh;overflow:hidden;}
   .tv-wrap{display:flex;flex-direction:column;height:100vh;}
-
-  /* Header */
   .tv-header{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;background:#1a1a1a;border-bottom:2px solid #27ae60;flex-shrink:0;}
   .tv-logo{font-size:16px;font-weight:700;color:#27ae60;letter-spacing:1px;}
   .tv-clock{font-size:20px;font-weight:700;color:#fff;}
@@ -20,22 +18,20 @@
   .tv-dots{display:flex;gap:6px;}
   .dot{width:8px;height:8px;border-radius:50%;background:#444;cursor:pointer;}
   .dot.active{background:#27ae60;}
-
-  /* Slides */
   .tv-body{flex:1;overflow:hidden;}
   .slide{display:none;height:100%;padding:10px 16px;overflow:hidden;}
   .slide.active{display:flex;flex-direction:column;}
   .slide-title{font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #333;flex-shrink:0;}
   .slide-body{flex:1;min-height:0;overflow:hidden;}
 
-  /* Slide 1: left stack + right column */
+  /* Slide 1: left 75% stacked, right 25% 4 tiles */
   .s1-grid{display:grid;grid-template-columns:3fr 1fr;gap:10px;height:100%;}
   .s1-left{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0;}
-  .s1-right{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0;}
+  .s1-right{display:flex;flex-direction:column;gap:6px;height:100%;min-height:0;}
 
-  /* Slide 2: slim header + 2x2 grid */
+  /* Slide 2: header + 2x2 */
   .s2-wrap{display:flex;flex-direction:column;height:100%;gap:8px;}
-  .s2-header{flex-shrink:0;background:#1a1a1a;border-radius:8px;padding:8px 14px;display:flex;gap:24px;align-items:center;}
+  .s2-header{flex-shrink:0;background:#1a1a1a;border-radius:8px;padding:8px 16px;display:flex;gap:20px;align-items:center;}
   .s2-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;flex:1;min-height:0;}
 
   /* Cards */
@@ -44,31 +40,26 @@
   .tv-card-title{font-size:9px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;flex-shrink:0;}
   .tv-card-body{flex:1;overflow:hidden;min-height:0;}
 
+  /* Stat tiles (right column slide 1) */
+  .stat-tile{background:#1a1a1a;border-radius:8px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;min-height:0;}
+  .stat-tile-title{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .stat-tile-num{font-weight:700;color:#fff;line-height:1;}
+  .stat-tile-sub{font-size:10px;color:#888;margin-top:4px;}
+
   /* Bars */
-  .bar-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+  .bar-row{display:flex;align-items:center;gap:6px;}
   .bar-label{width:24px;font-size:9px;color:#999;flex-shrink:0;}
   .bar-track{flex:1;background:#2a2a2a;border-radius:2px;height:14px;overflow:hidden;position:relative;}
   .bar-fill{height:14px;border-radius:2px;display:flex;align-items:center;padding:0 4px;}
   .bar-fill span{font-size:9px;color:#fff;white-space:nowrap;}
 
-  /* Stats */
-  .stat-num-lg{font-size:26px;font-weight:700;color:#fff;line-height:1;}
-  .stat-num-md{font-size:20px;font-weight:700;color:#fff;line-height:1;}
-  .stat-label{font-size:9px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
-  .stat-sub{font-size:9px;color:#888;margin-top:1px;}
-
-  /* Fin header stats */
-  .fstat{text-align:center;}
-  .fstat-num{font-size:18px;font-weight:700;color:#fff;}
-  .fstat-label{font-size:8px;color:#999;text-transform:uppercase;margin-top:1px;}
-
-  /* Table */
+  /* Tables */
   .tv-tbl{width:100%;border-collapse:collapse;font-size:10px;}
   .tv-tbl th{color:#999;font-weight:600;text-align:left;padding:3px 4px;border-bottom:1px solid #333;font-size:9px;}
   .tv-tbl td{padding:3px 4px;border-bottom:1px solid #1e1e1e;}
 
   /* Cash flow */
-  .cf-row{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+  .cf-row{display:flex;align-items:center;gap:5px;}
   .cf-label{width:22px;font-size:9px;color:#999;flex-shrink:0;}
   .cf-group{flex:1;display:flex;flex-direction:column;gap:1px;}
   .cf-track{background:#2a2a2a;border-radius:2px;height:10px;overflow:hidden;}
@@ -76,10 +67,15 @@
   .cf-fill span{font-size:7px;color:#fff;white-space:nowrap;}
   .cf-tot{width:56px;text-align:right;font-size:8px;color:#888;flex-shrink:0;}
 
+  /* Fin header */
+  .fstat{text-align:center;}
+  .fstat-num{font-size:17px;font-weight:700;color:#fff;}
+  .fstat-label{font-size:8px;color:#999;text-transform:uppercase;margin-top:1px;}
+
   /* Pie */
   .pie-wrap{display:flex;align-items:center;gap:8px;justify-content:center;}
-  .pie-leg{display:flex;flex-direction:column;gap:5px;}
-  .pie-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;}
+  .pie-leg{display:flex;flex-direction:column;gap:4px;}
+  .pie-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;}
   .pie-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
   .c-green{color:#27ae60!important;}
@@ -95,15 +91,9 @@
 <div class="tv-wrap">
   <div class="tv-header">
     <div class="tv-logo">OUT OF THE WOODS</div>
-    <div style="text-align:center">
-      <div class="tv-clock" id="tv-clock">--:--</div>
-      <div class="tv-date" id="tv-date"></div>
-    </div>
+    <div style="text-align:center"><div class="tv-clock" id="tv-clock">--:--</div><div class="tv-date" id="tv-date"></div></div>
     <div class="tv-nav">
-      <div class="tv-dots">
-        <div class="dot active" onclick="goSlide(0)"></div>
-        <div class="dot" onclick="goSlide(1)"></div>
-      </div>
+      <div class="tv-dots"><div class="dot active" onclick="goSlide(0)"></div><div class="dot" onclick="goSlide(1)"></div></div>
       <button class="tv-btn" onclick="prevSlide()">◀</button>
       <button class="tv-btn" onclick="nextSlide()">▶</button>
       <button class="tv-btn" id="pause-btn" onclick="togglePause()">⏸ Pause</button>
@@ -117,8 +107,6 @@
       <div class="slide-title">Sales Pipeline</div>
       <div class="slide-body">
         <div class="s1-grid">
-
-          <!-- Left: Leads (top) + Active Pipeline (bottom) -->
           <div class="s1-left">
             <div class="tv-card f1">
               <div class="tv-card-title">Leads Per Month (YTD)</div>
@@ -129,30 +117,27 @@
               <div class="tv-card-body" id="tv-funnel"><div class="loading"><span class="spinner"></span>Loading...</div></div>
             </div>
           </div>
-
-          <!-- Right: 4 compact tiles stacked -->
           <div class="s1-right">
-            <div class="tv-card f1" style="justify-content:center;align-items:center;text-align:center">
-              <div class="tv-card-title">Won vs Lost (YTD)</div>
+            <div class="stat-tile">
+              <div class="stat-tile-title">Won vs Lost (YTD)</div>
               <div id="tv-wonlost"></div>
             </div>
-            <div class="tv-card f1" style="justify-content:center;align-items:center;text-align:center">
-              <div class="stat-num-lg c-green" id="tv-win-rate">—</div>
-              <div class="stat-label">Win Rate</div>
-              <div class="stat-sub" id="tv-win-sub"></div>
+            <div class="stat-tile">
+              <div class="stat-tile-title">Win Rate</div>
+              <div class="stat-tile-num c-green" style="font-size:48px" id="tv-win-rate">—</div>
+              <div class="stat-tile-sub" id="tv-win-sub"></div>
             </div>
-            <div class="tv-card f1" style="justify-content:center;align-items:center;text-align:center">
-              <div class="stat-num-lg" id="tv-avg-days">—</div>
-              <div class="stat-label">Avg Days to Close</div>
-              <div class="stat-sub" id="tv-days-sub"></div>
+            <div class="stat-tile">
+              <div class="stat-tile-title">Avg Days to Close</div>
+              <div class="stat-tile-num" style="font-size:48px" id="tv-avg-days">—</div>
+              <div class="stat-tile-sub" id="tv-days-sub"></div>
             </div>
-            <div class="tv-card f1" style="justify-content:center;align-items:center;text-align:center">
-              <div class="stat-num-md" id="tv-avg-job">—</div>
-              <div class="stat-label">Avg Job Size</div>
-              <div class="stat-sub" id="tv-job-sub"></div>
+            <div class="stat-tile">
+              <div class="stat-tile-title">Avg Job Size</div>
+              <div class="stat-tile-num" style="font-size:28px" id="tv-avg-job">—</div>
+              <div class="stat-tile-sub" id="tv-job-sub"></div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -162,61 +147,34 @@
       <div class="slide-title">Operations &amp; Financial</div>
       <div class="slide-body">
         <div class="s2-wrap">
-
-          <!-- Slim header stats -->
           <div class="s2-header">
-            <div class="fstat">
-              <div class="fstat-num c-green" id="tv-backlog">—</div>
-              <div class="fstat-label">Backlog</div>
-            </div>
-            <div style="width:1px;height:30px;background:#333"></div>
-            <div class="fstat">
-              <div class="fstat-num" id="tv-ytd-rev">—</div>
-              <div class="fstat-label">YTD Revenue</div>
-            </div>
-            <div class="fstat">
-              <div class="fstat-num" id="tv-rev-pct">—</div>
-              <div class="fstat-label">Of YTD Goal</div>
-            </div>
-            <div class="fstat">
-              <div class="fstat-num" id="tv-rev-pace">—</div>
-              <div class="fstat-label">Annual Pace</div>
-            </div>
-            <div style="width:1px;height:30px;background:#333"></div>
-            <div class="fstat">
-              <div class="fstat-num c-green" id="tv-avg-gp-hdr">—</div>
-              <div class="fstat-label">Avg GP% Active</div>
-            </div>
-            <div class="fstat">
-              <div class="fstat-num" id="tv-ytd-gp-hdr">—</div>
-              <div class="fstat-label">Avg GP% YTD</div>
-            </div>
+            <div class="fstat"><div class="fstat-num c-green" id="tv-backlog">—</div><div class="fstat-label">Backlog</div></div>
+            <div style="width:1px;height:28px;background:#333"></div>
+            <div class="fstat"><div class="fstat-num" id="tv-ytd-rev">—</div><div class="fstat-label">YTD Revenue</div></div>
+            <div class="fstat"><div class="fstat-num" id="tv-rev-pct">—</div><div class="fstat-label">Of YTD Goal</div></div>
+            <div class="fstat"><div class="fstat-num" id="tv-rev-pace">—</div><div class="fstat-label">Annual Pace</div></div>
+            <div style="width:1px;height:28px;background:#333"></div>
+            <div class="fstat"><div class="fstat-num c-green" id="tv-avg-gp-hdr">—</div><div class="fstat-label">Avg GP% Active</div></div>
+            <div class="fstat"><div class="fstat-num" id="tv-ytd-gp-hdr">—</div><div class="fstat-label">Avg GP% YTD</div></div>
           </div>
-
-          <!-- 2x2 grid -->
           <div class="s2-grid">
-            <!-- Top-left: GP% -->
             <div class="tv-card">
               <div class="tv-card-title">GP% by Job — In Production</div>
               <div class="tv-card-body" id="tv-gp-table"><div class="loading"><span class="spinner"></span>Loading...</div></div>
             </div>
-            <!-- Top-right: Revenue Goal -->
             <div class="tv-card">
               <div class="tv-card-title">Revenue vs Goal — YTD</div>
               <div class="tv-card-body" id="tv-revgoal"><div class="loading"><span class="spinner"></span>Loading...</div></div>
             </div>
-            <!-- Bottom-left: Cash flow -->
             <div class="tv-card">
               <div class="tv-card-title">Cash In vs Out — YTD &nbsp;<span style="font-size:8px;color:#555"><span style="color:#27ae60">■</span> In <span style="color:#c0392b">■</span> Bills <span style="color:#e67e22">■</span> Labor <span style="color:#8e44ad">■</span> OH</span></div>
               <div class="tv-card-body" id="tv-cashflow"><div class="loading"><span class="spinner"></span>Loading...</div></div>
             </div>
-            <!-- Bottom-right: Labor -->
             <div class="tv-card">
               <div class="tv-card-title">Budgeted vs Actual Labor — In Production</div>
               <div class="tv-card-body" id="tv-labor-table"><div class="loading"><span class="spinner"></span>Loading...</div></div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -232,6 +190,7 @@ const OUTCOME_DATE_CF='22PYznLnyz9R';
 const LABOR_TYPE_ID='22PEnmvkyEJ2';
 const GRANT_KEY='22TSP4tXi4XtJCf3kydhJhLCjXytzHFeBm';
 const INTERNAL_JOB='22PRPSP7jMP2';
+const EXCLUDE_JOB='22PM5BcPa9PR'; // Bosch C Windows
 const LC_IDS=new Set(['22PKqY8AD7gA','22PHbqmsSWV3','22PLzQjq9Lnm','22PXzZvkvr8v']);
 const STAFF_IDS=new Set(['22PWrLmyK4z3']);
 const APP_IDS=new Set(['22PRPkkDd3WX']);
@@ -257,6 +216,8 @@ function fmtP(n){return n==null?'—':(Math.round(n*10)/10)+'%';}
 function fmtH(h){return h>0?Math.round(h*10)/10+'h':'—';}
 function pctN(a,b){return b?Math.round((a/b)*100):null;}
 function getCF(j,id){return j.customFieldValues?.nodes?.find(c=>c.customField?.id===id)?.value||null;}
+function getNameType(name){const n=(name||'').toLowerCase();if(n.includes('- lc')||n.includes('lead carp'))return 'LC';if(n.includes('staff'))return 'Staff';if(n.includes('apprentice')||n.includes('laborer'))return 'Apprentice';return 'Other';}
+function getUserType(id){return LC_IDS.has(id)?'LC':STAFF_IDS.has(id)?'Staff':APP_IDS.has(id)?'Apprentice':'Other';}
 
 function updateClock(){
   const now=new Date();
@@ -268,11 +229,7 @@ setInterval(updateClock,1000);updateClock();
 const SLIDES=['slide-pipeline','slide-ops'];
 const INTERVAL=20000;
 let currentSlide=0,paused=false,timer=null;
-function showSlide(i){
-  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
-  document.getElementById(SLIDES[i]).classList.add('active');
-  document.querySelectorAll('.dot').forEach((d,idx)=>d.classList.toggle('active',idx===i));
-}
+function showSlide(i){document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));document.getElementById(SLIDES[i]).classList.add('active');document.querySelectorAll('.dot').forEach((d,idx)=>d.classList.toggle('active',idx===i));}
 function goSlide(i){currentSlide=i;showSlide(i);resetTimer();}
 function nextSlide(){currentSlide=(currentSlide+1)%SLIDES.length;showSlide(currentSlide);resetTimer();}
 function prevSlide(){currentSlide=(currentSlide-1+SLIDES.length)%SLIDES.length;showSlide(currentSlide);resetTimer();}
@@ -280,6 +237,7 @@ function togglePause(){paused=!paused;document.getElementById('pause-btn').textC
 function resetTimer(){clearTimeout(timer);if(!paused)timer=setTimeout(nextSlide,INTERVAL);}
 resetTimer();
 
+// ─── PIPELINE ────────────────────────────────────────────────────────────────
 async function loadPipeline(){
   try{
     const thisYear=new Date().getFullYear();
@@ -291,46 +249,39 @@ async function loadPipeline(){
     const cm=new Date().getMonth(),maxC=Math.max(...mc,LEAD_GOAL,1);
     const goalPct=Math.min((LEAD_GOAL/maxC)*100,98);
 
-    // Leads chart — spread bars to fill height
-    let html='<div style="display:flex;flex-direction:column;height:100%;justify-content:space-evenly">';
+    let html=`<div style="display:flex;flex-direction:column;height:100%;justify-content:space-evenly">`;
     for(let i=0;i<=cm;i++){
-      const p=(mc[i]/maxC)*100;
-      const bc=mc[i]>=LEAD_GOAL?'#27ae60':mc[i]>=LEAD_GOAL-2?'#e67e22':'#c0392b';
+      const p=(mc[i]/maxC)*100,bc=mc[i]>=LEAD_GOAL?'#27ae60':mc[i]>=LEAD_GOAL-2?'#e67e22':'#c0392b';
       html+=`<div class="bar-row"><div class="bar-label">${months[i]}</div><div class="bar-track" style="position:relative"><div class="bar-fill" style="width:${Math.max(p,5)}%;background:${bc}"><span>${mc[i]}</span></div><div style="position:absolute;top:0;left:${goalPct}%;width:2px;height:100%;background:#fff;opacity:0.5"></div></div></div>`;
     }
     const ytd=mc.slice(0,cm+1).reduce((s,v)=>s+v,0);
     html+=`</div><div style="font-size:9px;color:#999;margin-top:4px">${ytd} leads YTD · Goal: ${(cm+1)*LEAD_GOAL} · Pace: ${Math.round((ytd/(cm+1))*12)}/yr</div>`;
     document.getElementById('tv-leads').innerHTML=html;
 
-    // Funnel — spread to fill height
-    const stageCounts={};
-    FUNNEL_STAGES.forEach(s=>stageCounts[s.key]=0);
-    jobs.forEach(j=>{const v=getCF(j,STATUS_CF);if(v&&stageCounts[v]!==undefined)stageCounts[v]++;});
-    const maxSt=Math.max(...Object.values(stageCounts),1);
-    const activeStages=FUNNEL_STAGES.filter(s=>stageCounts[s.key]>0);
+    const sc={};FUNNEL_STAGES.forEach(s=>sc[s.key]=0);
+    jobs.forEach(j=>{const v=getCF(j,STATUS_CF);if(v&&sc[v]!==undefined)sc[v]++;});
+    const maxSt=Math.max(...Object.values(sc),1);
+    const active=FUNNEL_STAGES.filter(s=>sc[s.key]>0);
     let fHtml=`<div style="display:flex;flex-direction:column;height:100%;justify-content:space-evenly">`;
-    activeStages.forEach(s=>{
-      const cnt=stageCounts[s.key];
-      const p=(cnt/maxSt)*100;
-      fHtml+=`<div class="bar-row"><div style="width:130px;font-size:8px;color:#999;text-align:right;flex-shrink:0;padding-right:6px">${s.key}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(p,5)}%;background:${s.color}"><span>${cnt}</span></div></div></div>`;
-    });
+    active.forEach(s=>{const cnt=sc[s.key],p=(cnt/maxSt)*100;fHtml+=`<div class="bar-row"><div style="width:130px;font-size:8px;color:#999;text-align:right;flex-shrink:0;padding-right:6px">${s.key}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(p,5)}%;background:${s.color}"><span>${cnt}</span></div></div></div>`;});
     fHtml+=`</div>`;
     document.getElementById('tv-funnel').innerHTML=fHtml;
 
-    // Won vs Lost
     let won=0,lost=0,wonPrices=[];
     jobs.forEach(j=>{
       const outcome=getCF(j,OUTCOME_DATE_CF);
       if(!outcome||new Date(outcome).getFullYear()!==thisYear)return;
       const status=getCF(j,STATUS_CF);
+      const name=(j.name||'').toLowerCase();
+      if(name.includes('warranty'))return;
       if(WON_STATUSES.has(status)){won++;if((j.projectedPrice||0)>5000)wonPrices.push(j.projectedPrice);}
       else if(LOST_STATUSES.has(status))lost++;
     });
     const total=won+lost,wonPct=total>0?Math.round((won/total)*100):0;
-    const svg=`<svg viewBox="0 0 100 100" style="width:60px;height:60px"><circle cx="50" cy="50" r="40" fill="none" stroke="#c0392b" stroke-width="20"/><circle cx="50" cy="50" r="40" fill="none" stroke="#27ae60" stroke-width="20" stroke-dasharray="${wonPct*2.51} 251" stroke-dashoffset="62.75" transform="rotate(-90 50 50)"/></svg>`;
+    const r=wonPct,svg=`<svg viewBox="0 0 100 100" style="width:70px;height:70px"><circle cx="50" cy="50" r="40" fill="none" stroke="#c0392b" stroke-width="20"/><circle cx="50" cy="50" r="40" fill="none" stroke="#27ae60" stroke-width="20" stroke-dasharray="${r*2.51} 251" stroke-dashoffset="62.75" transform="rotate(-90 50 50)"/></svg>`;
     document.getElementById('tv-wonlost').innerHTML=`<div class="pie-wrap">${svg}<div class="pie-leg"><div class="pie-leg-item"><div class="pie-dot" style="background:#27ae60"></div>Won: ${won}</div><div class="pie-leg-item"><div class="pie-dot" style="background:#c0392b"></div>Lost: ${lost}</div></div></div>`;
     document.getElementById('tv-win-rate').textContent=wonPct+'%';
-    document.getElementById('tv-win-sub').textContent=`${won} won · ${lost} lost`;
+    document.getElementById('tv-win-sub').textContent=`${won} won · ${lost} lost YTD`;
 
     let totalDays=0,dayCount=0;
     jobs.forEach(j=>{
@@ -351,75 +302,93 @@ async function loadPipeline(){
   }catch(e){console.error('Pipeline error',e);}
 }
 
+// ─── GP% ─────────────────────────────────────────────────────────────────────
 async function loadGP(){
   try{
-    const jobsRes=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100,where:{'=':[{field:['closedOn']},{value:null}]}},nodes:{id:{},name:{},location:{account:{name:{}}},projectedPrice:{},customFieldValues:{$:{size:10},nodes:{customField:{id:{}},value:{}}}}}}});
-    const ipJobs=jobsRes.organization.jobs.nodes.filter(j=>{
-      if(j.id===INTERNAL_JOB)return false;
-      return j.customFieldValues?.nodes?.some(c=>c.customField?.id===STATUS_CF&&c.value==='In Production');
-    });
-    let rows=[];
+    const thisYear=new Date().getFullYear();
+    const res=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100},nodes:{id:{},name:{},location:{account:{name:{}}},projectedPrice:{},projectedCost:{},actualCost:{},customFieldValues:{$:{size:10},nodes:{customField:{id:{}},value:{}}}}}}});
+    const allJobs=res.organization.jobs.nodes;
+
+    // In Production jobs
+    const ipJobs=allJobs.filter(j=>j.id!==INTERNAL_JOB&&getCF(j,STATUS_CF)==='In Production');
+
+    // Fetch budget (includeInBudget document) for each IP job
     for(const job of ipJobs){
-      const r=await query({job:{$:{id:job.id},projectedCost:{},costItems:{$:{size:100},sum:{$:'cost'}}}});
-      const contract=job.projectedPrice||0;
-      const budgCost=r.job.costItems?.sum||0;
-      const projCost=r.job.projectedCost||0;
-      const budgGP=contract>0?pctN(contract-budgCost,contract):null;
-      const projGP=contract>0?pctN(contract-projCost,contract):null;
-      const variance=budgGP!=null&&projGP!=null?Math.round((projGP-budgGP)*10)/10:null;
-      rows.push({name:job.location?.account?.name||job.name,contract,budgGP,projGP,variance});
+      const r=await query({job:{$:{id:job.id},documents:{$:{size:10,where:{and:[{'=':[{field:['type']},{value:'customerOrder'}]},{'=':[{field:['status']},{value:'approved'}]},{'=':[{field:['includeInBudget']},{value:true}]}]}},nodes:{cost:{},price:{}}}}});
+      const orders=r.job.documents?.nodes||[];
+      job.bPrice=orders.reduce((s,o)=>s+(o.price||0),0);
+      job.bCost=orders.reduce((s,o)=>s+(o.cost||0),0);
     }
-    const gpVals=rows.filter(r=>r.projGP!=null);
-    const avgIP=gpVals.length>0?gpVals.reduce((s,r)=>s+r.projGP,0)/gpVals.length:0;
+
+    const margins=[];
+    let html=`<table class="tv-tbl"><thead><tr><th>Job</th><th>Contract</th><th>Budg GP%</th><th>Proj GP%</th><th>Var</th></tr></thead><tbody>`;
+    ipJobs.forEach(job=>{
+      const price=job.projectedPrice,cost=job.projectedCost;
+      const projM=price&&cost!=null?(price-cost)/price*100:null;
+      const budgM=job.bPrice>0?(job.bPrice-job.bCost)/job.bPrice*100:null;
+      const variance=budgM!=null&&projM!=null?Math.round((projM-budgM)*10)/10:null;
+      if(projM!=null)margins.push(projM);
+      const vClass=variance==null?'':variance>=-2?'c-green':variance>=-5?'c-orange':'c-red';
+      html+=`<tr><td>${job.location?.account?.name||job.name}</td><td>${fmt(price)}</td><td>${fmtP(budgM)}</td><td class="${projM!=null&&budgM!=null&&projM<budgM-2?'c-orange':'c-green'}">${fmtP(projM)}</td><td class="${vClass}">${variance!=null?(variance>=0?'+':'')+variance+'%':'—'}</td></tr>`;
+    });
+    html+=`</tbody></table>`;
+    document.getElementById('tv-gp-table').innerHTML=html;
+
+    const avgIP=margins.length>0?margins.reduce((s,v)=>s+v,0)/margins.length:0;
     document.getElementById('tv-avg-gp-hdr').textContent=fmtP(avgIP);
 
-    const closedRes=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100,where:{and:[{'!=':[{field:['closedOn']},{value:null}]},{between:[{field:['closedOn']},[{datetime:{startOf:'year'}},{datetime:{endOf:'year'}}]]}]}},nodes:{id:{},projectedPrice:{},projectedCost:{}}}}});
-    const closed=closedRes.organization.jobs.nodes.filter(j=>j.id!==INTERNAL_JOB&&(j.projectedPrice||0)>5000);
-    const ytdGPs=closed.map(j=>{const c=j.projectedPrice||0,cost=j.projectedCost||0;return c>0?pctN(c-cost,c):null;}).filter(v=>v!=null);
-    const avgYTD=ytdGPs.length>0?ytdGPs.reduce((s,v)=>s+v,0)/ytdGPs.length:0;
+    // YTD GP% — Job Complete, outcome this year, non-warranty, price >= 5000
+    const ytdMargins=allJobs.filter(j=>{
+      if(j.id===INTERNAL_JOB||j.id===EXCLUDE_JOB)return false;
+      const status=getCF(j,STATUS_CF),outcome=getCF(j,OUTCOME_DATE_CF);
+      const name=(j.name||'').toLowerCase();
+      return status==='Job Complete'&&outcome&&new Date(outcome).getFullYear()===thisYear&&(j.projectedPrice||0)>=5000&&j.actualCost!=null&&!name.includes('warranty');
+    }).map(j=>(j.projectedPrice-j.actualCost)/j.projectedPrice*100);
+    const avgYTD=ytdMargins.length>0?ytdMargins.reduce((a,b)=>a+b,0)/ytdMargins.length:null;
     document.getElementById('tv-ytd-gp-hdr').textContent=fmtP(avgYTD);
-
-    let html=`<div style="height:100%;display:flex;flex-direction:column">
-      <table class="tv-tbl" style="flex-shrink:0"><thead><tr><th>Job</th><th>Contract</th><th>Proj GP%</th><th>Var</th></tr></thead><tbody>`;
-    rows.forEach(r=>{
-      const vClass=r.variance==null?'':r.variance>=-2?'c-green':r.variance>=-5?'c-orange':'c-red';
-      html+=`<tr><td>${r.name}</td><td>${fmt(r.contract)}</td><td class="${r.projGP!=null&&r.budgGP!=null&&r.projGP<r.budgGP-2?'c-orange':'c-green'}">${fmtP(r.projGP)}</td><td class="${vClass}">${r.variance!=null?(r.variance>=0?'+':'')+r.variance+'%':'—'}</td></tr>`;
-    });
-    html+=`</tbody></table></div>`;
-    document.getElementById('tv-gp-table').innerHTML=html;
   }catch(e){console.error('GP error',e);}
 }
 
+// ─── LABOR ───────────────────────────────────────────────────────────────────
 async function loadLabor(){
   try{
     const jobsRes=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100,where:{'=':[{field:['closedOn']},{value:null}]}},nodes:{id:{},name:{},location:{account:{name:{}}},customFieldValues:{$:{size:10},nodes:{customField:{id:{}},value:{}}}}}}});
-    const ipJobs=jobsRes.organization.jobs.nodes.filter(j=>{
-      if(j.id===INTERNAL_JOB)return false;
-      return j.customFieldValues?.nodes?.some(c=>c.customField?.id===STATUS_CF&&c.value==='In Production');
-    });
+    const ipJobs=jobsRes.organization.jobs.nodes.filter(j=>j.id!==INTERNAL_JOB&&getCF(j,STATUS_CF)==='In Production');
     let rows=[];
     for(const job of ipJobs){
-      const r=await query({job:{$:{id:job.id},
-        costItems:{$:{size:100,where:{and:[
-          {'=':[{field:['costType','id']},{value:LABOR_TYPE_ID}]},
-          {'=':[{field:['jobCostItem','id']},{value:null}]}
-        ]}},nodes:{cost:{},name:{}}},
-        timeEntries:{$:{size:100,where:{between:[{field:['startedAt']},[{datetime:{startOf:'year'}},{datetime:{endOf:'year'}}]]}},nodes:{cost:{},hours:{},user:{id:{}}}}
-      }});
-      const budgC=r.job.costItems.nodes.reduce((s,i)=>s+(i.cost||0),0);
-      const actC=r.job.timeEntries.nodes.reduce((s,t)=>s+(t.cost||0),0);
-      const lcH=r.job.timeEntries.nodes.filter(t=>LC_IDS.has(t.user?.id)).reduce((s,t)=>s+(t.hours||0),0);
-      const stH=r.job.timeEntries.nodes.filter(t=>STAFF_IDS.has(t.user?.id)).reduce((s,t)=>s+(t.hours||0),0);
-      const apH=r.job.timeEntries.nodes.filter(t=>APP_IDS.has(t.user?.id)).reduce((s,t)=>s+(t.hours||0),0);
-      rows.push({name:job.location?.account?.name||job.name,budgC,actC,lcH,stH,apH,pct:pctN(actC,budgC)});
+      const budgeted={LC:0,Staff:0,Apprentice:0,Other:0},actual={LC:0,Staff:0,Apprentice:0,Other:0},hoursA={LC:0,Staff:0,Apprentice:0,Other:0};
+
+      // Budget: try document costItems first
+      const orderRes=await query({job:{$:{id:job.id},documents:{$:{size:10,where:{and:[{'=':[{field:['type']},{value:'customerOrder'}]},{'=':[{field:['status']},{value:'approved'}]},{'=':[{field:['includeInBudget']},{value:true}]}]}},nodes:{id:{}}}}});
+      const orders=orderRes.job.documents?.nodes||[];
+      let docTotal=0;
+      for(const order of orders){
+        const cr=await query({document:{$:{id:order.id},costItems:{$:{size:100,where:{'=':[{field:['costType','id']},{value:LABOR_TYPE_ID}]}},nodes:{cost:{},name:{}}}}});
+        (cr.document.costItems?.nodes||[]).forEach(ci=>{const t=getNameType(ci.name);budgeted[t]=(budgeted[t]||0)+(ci.cost||0);docTotal+=(ci.cost||0);});
+      }
+      // Fallback: job-level cost items
+      if(docTotal===0){
+        const cr=await query({job:{$:{id:job.id},costItems:{$:{size:100,where:{and:[{'=':[{field:['costType','id']},{value:LABOR_TYPE_ID}]},{'=':[{field:['jobCostItem','id']},{value:null}]}]}},nodes:{cost:{},name:{}}}}});
+        (cr.job.costItems?.nodes||[]).forEach(ci=>{const t=getNameType(ci.name);budgeted[t]=(budgeted[t]||0)+(ci.cost||0);});
+      }
+
+      // Actual: time entries (all, paginated)
+      let tePage=null;
+      do{
+        const tr=await query({job:{$:{id:job.id},timeEntries:{$:{size:100,...(tePage?{page:tePage}:{})},nextPage:{},nodes:{cost:{},minutes:{},user:{id:{}}}}}});
+        (tr.job.timeEntries?.nodes||[]).forEach(te=>{const t=getUserType(te.user?.id);actual[t]=(actual[t]||0)+(te.cost||0);hoursA[t]=(hoursA[t]||0)+((te.minutes||0)/60);});
+        tePage=tr.job.timeEntries?.nextPage||null;
+      }while(tePage);
+
+      const totB=Object.values(budgeted).reduce((s,v)=>s+v,0);
+      const totA=Object.values(actual).reduce((s,v)=>s+v,0);
+      const totH=Object.values(hoursA).reduce((s,v)=>s+v,0);
+      rows.push({name:job.location?.account?.name||job.name,totB,totA,totH,lcH:hoursA.LC,stH:hoursA.Staff,apH:hoursA.Apprentice,pct:pctN(totA,totB)});
     }
     const pClass=p=>p==null?'':p<=50?'c-green':p<=85?'c-orange':'c-red';
     let html=`<table class="tv-tbl"><thead><tr><th>Job</th><th>Budget</th><th>Actual</th><th>%</th><th>LC h</th><th>Staff h</th><th>App h</th></tr></thead><tbody>`;
     let tB=0,tA=0;
-    rows.forEach(r=>{
-      tB+=r.budgC;tA+=r.actC;
-      html+=`<tr><td>${r.name}</td><td>${fmt(r.budgC)}</td><td>${fmt(r.actC)}</td><td class="${pClass(r.pct)}">${r.pct!=null?r.pct+'%':'—'}</td><td>${fmtH(r.lcH)}</td><td>${fmtH(r.stH)}</td><td>${fmtH(r.apH)}</td></tr>`;
-    });
+    rows.forEach(r=>{tB+=r.totB;tA+=r.totA;html+=`<tr><td>${r.name}</td><td>${fmt(r.totB)}</td><td>${fmt(r.totA)}</td><td class="${pClass(r.pct)}">${r.pct!=null?r.pct+'%':'—'}</td><td>${fmtH(r.lcH)}</td><td>${fmtH(r.stH)}</td><td>${fmtH(r.apH)}</td></tr>`;});
     const totPct=pctN(tA,tB);
     html+=`<tr style="border-top:2px solid #444;font-weight:700"><td>TOTAL</td><td>${fmt(tB)}</td><td>${fmt(tA)}</td><td class="${pClass(totPct)}">${totPct!=null?totPct+'%':'—'}</td><td colspan="3"></td></tr>`;
     html+='</tbody></table>';
@@ -427,6 +396,7 @@ async function loadLabor(){
   }catch(e){console.error('Labor error',e);}
 }
 
+// ─── FINANCIAL ───────────────────────────────────────────────────────────────
 async function loadFinancial(){
   try{
     const mIn=Array(12).fill(0),mOut=Array(12).fill(0),mLab=Array(12).fill(0),mOvh=Array(12).fill(0);
@@ -443,21 +413,15 @@ async function loadFinancial(){
 
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const cm=new Date().getMonth();
-
-    // Cash flow
     const maxV=Math.max(...mIn.slice(0,cm+1),...mOut.slice(0,cm+1),...mLab.slice(0,cm+1),...mOvh.slice(0,cm+1),1);
     let cfHtml=`<div style="display:flex;flex-direction:column;height:100%;justify-content:space-evenly">`;
     for(let i=0;i<=cm;i++){
       const ip=(mIn[i]/maxV)*100,bp=(mOut[i]/maxV)*100,lp=(mLab[i]/maxV)*100,op=(mOvh[i]/maxV)*100,tot=mOut[i]+mLab[i]+mOvh[i];
-      cfHtml+=`<div class="cf-row"><div class="cf-label">${months[i]}</div><div class="cf-group">
-        <div class="cf-track"><div class="cf-fill" style="width:${Math.max(ip,1)}%;background:#27ae60"><span>${fmt(mIn[i])}</span></div></div>
-        <div class="cf-track" style="display:flex;overflow:hidden"><div style="width:${bp}%;background:#c0392b;height:10px;flex-shrink:0"></div><div style="width:${lp}%;background:#e67e22;height:10px;flex-shrink:0"></div><div style="width:${op}%;background:#8e44ad;height:10px;flex-shrink:0"></div></div>
-      </div><div class="cf-tot">${fmt(tot)}</div></div>`;
+      cfHtml+=`<div class="cf-row"><div class="cf-label">${months[i]}</div><div class="cf-group"><div class="cf-track"><div class="cf-fill" style="width:${Math.max(ip,1)}%;background:#27ae60"><span>${fmt(mIn[i])}</span></div></div><div class="cf-track" style="display:flex;overflow:hidden"><div style="width:${bp}%;background:#c0392b;height:10px;flex-shrink:0"></div><div style="width:${lp}%;background:#e67e22;height:10px;flex-shrink:0"></div><div style="width:${op}%;background:#8e44ad;height:10px;flex-shrink:0"></div></div></div><div class="cf-tot">${fmt(tot)}</div></div>`;
     }
     cfHtml+=`</div>`;
     document.getElementById('tv-cashflow').innerHTML=cfHtml;
 
-    // Revenue stats header
     const ytdRev=mIn.slice(0,cm+1).reduce((s,v)=>s+v,0);
     const ytdGoal=(cm+1)*REVENUE_GOAL_MONTHLY;
     const pace=Math.round((ytdRev/(cm+1))*12);
@@ -468,38 +432,19 @@ async function loadFinancial(){
     pctEl.textContent=pct+'%';
     pctEl.className='fstat-num '+(pct>=100?'c-green':pct>=75?'c-orange':'c-red');
 
-    // Revenue goal chart
     const maxBar=Math.max(...mIn.slice(0,cm+1),REVENUE_GOAL_MONTHLY*1.2,1);
     const chartH=120;
     const goalY=100-((REVENUE_GOAL_MONTHLY/maxBar)*100);
-    let revHtml=`<div style="display:flex;gap:5px;height:100%">
-      <div style="width:36px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:3px;padding-bottom:18px;flex-shrink:0">
-        <span style="font-size:7px;color:#666">${fmt(Math.round(maxBar/1000)*1000)}</span>
-        <span style="font-size:7px;color:#e67e22">${fmt(REVENUE_GOAL_MONTHLY)}</span>
-        <span style="font-size:7px;color:#666">$0</span>
-      </div>
-      <div style="flex:1;position:relative">
-        <div style="position:absolute;left:0;right:0;top:${goalY}%;height:1px;background:#e67e22;opacity:0.8;z-index:2"></div>
-        <div style="display:flex;align-items:flex-end;gap:2px;height:${chartH}px;border-bottom:1px solid #444;border-left:1px solid #444">
-          ${mIn.slice(0,cm+1).map(v=>{
-            const bH=Math.max((v/maxBar)*chartH,2);
-            const bC=v>=REVENUE_GOAL_MONTHLY?'#27ae60':v>=(REVENUE_GOAL_MONTHLY*0.75)?'#e67e22':'#c0392b';
-            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><span style="font-size:6px;color:#aaa;margin-bottom:1px">${fmt(v)}</span><div style="width:100%;background:${bC};height:${bH}px;border-radius:2px 2px 0 0"></div></div>`;
-          }).join('')}
-        </div>
-        <div style="display:flex;gap:2px;margin-top:2px">${months.slice(0,cm+1).map(m=>`<div style="flex:1;text-align:center;font-size:7px;color:#888">${m}</div>`).join('')}</div>
-      </div>
-    </div>`;
+    let revHtml=`<div style="display:flex;gap:5px;height:100%"><div style="width:36px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:3px;padding-bottom:18px;flex-shrink:0"><span style="font-size:7px;color:#666">${fmt(Math.round(maxBar/1000)*1000)}</span><span style="font-size:7px;color:#e67e22">${fmt(REVENUE_GOAL_MONTHLY)}</span><span style="font-size:7px;color:#666">$0</span></div><div style="flex:1;position:relative"><div style="position:absolute;left:0;right:0;top:${goalY}%;height:1px;background:#e67e22;opacity:0.8;z-index:2"></div><div style="display:flex;align-items:flex-end;gap:2px;height:${chartH}px;border-bottom:1px solid #444;border-left:1px solid #444">${mIn.slice(0,cm+1).map(v=>{const bH=Math.max((v/maxBar)*chartH,2),bC=v>=REVENUE_GOAL_MONTHLY?'#27ae60':v>=(REVENUE_GOAL_MONTHLY*0.75)?'#e67e22':'#c0392b';return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><span style="font-size:6px;color:#aaa;margin-bottom:1px">${fmt(v)}</span><div style="width:100%;background:${bC};height:${bH}px;border-radius:2px 2px 0 0"></div></div>`;}).join('')}</div><div style="display:flex;gap:2px;margin-top:2px">${months.slice(0,cm+1).map(m=>`<div style="flex:1;text-align:center;font-size:7px;color:#888">${m}</div>`).join('')}</div></div></div>`;
     document.getElementById('tv-revgoal').innerHTML=revHtml;
 
     // Backlog
     const jobsRes=await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100,where:{'=':[{field:['closedOn']},{value:null}]}},nodes:{id:{},projectedPrice:{},customFieldValues:{$:{size:10},nodes:{customField:{id:{}},value:{}}}}}}});
-    const ipJobs=jobsRes.organization.jobs.nodes.filter(j=>{if(j.id===INTERNAL_JOB)return false;return j.customFieldValues?.nodes?.some(c=>c.customField?.id===STATUS_CF&&c.value==='In Production');});
+    const ipJobs=jobsRes.organization.jobs.nodes.filter(j=>j.id!==INTERNAL_JOB&&getCF(j,STATUS_CF)==='In Production');
     let unbilled=0;
     for(const job of ipJobs){
       const ir=await query({job:{$:{id:job.id},documents:{$:{size:50,where:{and:[{'=':[{field:['type']},{value:'customerInvoice'}]},{'=':[{field:['status']},{value:'approved'}]}]}},nodes:{price:{}}}}});
-      const invoiced=ir.job.documents.nodes.reduce((s,i)=>s+(i.price||0),0);
-      unbilled+=Math.max((job.projectedPrice||0)-invoiced,0);
+      unbilled+=Math.max((job.projectedPrice||0)-ir.job.documents.nodes.reduce((s,i)=>s+(i.price||0),0),0);
     }
     document.getElementById('tv-backlog').textContent=fmt(unbilled);
   }catch(e){console.error('Financial error',e);}
