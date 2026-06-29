@@ -763,13 +763,14 @@ async function loadFinancial() {
 // ─── REVENUE GOAL ────────────────────────────────────────────────────────────
 // Replace the entire loadRevenueGoal() function with this:
 
+// Replace the entire loadRevenueGoal() function with this:
+
 async function loadRevenueGoal() {
   document.getElementById('s-revgoal').textContent='Loading...';
   try {
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const cm=new Date().getMonth();
 
-    // Reuse mIn data already fetched by loadFinancial
     let attempts=0;
     while(!window._mIn && attempts++<20) await new Promise(r=>setTimeout(r,500));
     const mIn=window._mIn||Array(12).fill(0);
@@ -779,61 +780,37 @@ async function loadRevenueGoal() {
     const annualPace=Math.round((ytdRevenue/(cm+1))*12);
     const ytdPct=Math.min(Math.round((ytdRevenue/ytdGoal)*100),999);
     const maxBar=Math.max(...mIn.slice(0,cm+1),REVENUE_GOAL_MONTHLY*1.2,1);
-    const chartH=160; // px height of chart area
-    const goalY=100-((REVENUE_GOAL_MONTHLY/maxBar)*100); // % from top where goal line sits
+    const chartH=120;
+    const goalY=100-((REVENUE_GOAL_MONTHLY/maxBar)*100);
 
-    // YTD summary row
-    let html=`<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #333">
-      <div class="fin-stat">
-        <div class="fin-stat-num" style="color:${ytdRevenue>=ytdGoal?'#27ae60':'#e67e22'}">${fmt(ytdRevenue)}</div>
-        <div class="fin-stat-label">YTD Revenue</div>
-      </div>
-      <div class="fin-stat">
-        <div class="fin-stat-num">${fmt(ytdGoal)}</div>
-        <div class="fin-stat-label">YTD Goal</div>
-      </div>
-      <div class="fin-stat">
-        <div class="fin-stat-num" style="color:${ytdPct>=100?'#27ae60':ytdPct>=75?'#e67e22':'#c0392b'}">${ytdPct}%</div>
-        <div class="fin-stat-label">Of YTD Goal</div>
-      </div>
-      <div class="fin-stat">
-        <div class="fin-stat-num">${fmt(annualPace)}</div>
-        <div class="fin-stat-label">Annual Pace</div>
-      </div>
-      <div class="fin-stat">
-        <div class="fin-stat-num">${fmt(REVENUE_GOAL_MONTHLY*12)}</div>
-        <div class="fin-stat-label">Annual Goal</div>
-      </div>
+    let html=`<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333">
+      <div class="fin-stat"><div class="fin-stat-num">${fmt(ytdRevenue)}</div><div class="fin-stat-label">YTD Revenue</div></div>
+      <div class="fin-stat"><div class="fin-stat-num">${fmt(ytdGoal)}</div><div class="fin-stat-label">YTD Goal</div></div>
+      <div class="fin-stat"><div class="fin-stat-num" style="color:${ytdPct>=100?'#27ae60':ytdPct>=75?'#e67e22':'#c0392b'}">${ytdPct}%</div><div class="fin-stat-label">Of YTD Goal</div></div>
+      <div class="fin-stat"><div class="fin-stat-num">${fmt(annualPace)}</div><div class="fin-stat-label">Annual Pace</div></div>
+      <div class="fin-stat"><div class="fin-stat-num">${fmt(REVENUE_GOAL_MONTHLY*12)}</div><div class="fin-stat-label">Annual Goal</div></div>
     </div>`;
 
-    // Vertical bar chart
-    html+=`<div style="position:relative;padding:0 8px">
-      <!-- Y-axis labels -->
-      <div style="position:absolute;left:0;top:0;bottom:24px;width:48px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:6px">
-        <span style="font-size:9px;color:#666">${fmt(maxBar)}</span>
+    html+=`<div style="display:flex;gap:8px">
+      <div style="width:44px;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:4px;padding-bottom:18px">
+        <span style="font-size:9px;color:#666">${fmt(Math.round(maxBar/1000)*1000)}</span>
         <span style="font-size:9px;color:#e67e22">${fmt(REVENUE_GOAL_MONTHLY)}</span>
         <span style="font-size:9px;color:#666">$0</span>
       </div>
-      <!-- Chart area -->
-      <div style="margin-left:52px;position:relative">
-        <!-- Goal line -->
-        <div style="position:absolute;left:0;right:0;top:${goalY}%;height:2px;background:#e67e22;opacity:0.7;z-index:2">
-          <span style="position:absolute;right:0;top:-14px;font-size:9px;color:#e67e22;white-space:nowrap">Goal ${fmt(REVENUE_GOAL_MONTHLY)}</span>
-        </div>
-        <!-- Bars -->
-        <div style="display:flex;align-items:flex-end;gap:4px;height:${chartH}px;border-bottom:1px solid #444;border-left:1px solid #444">
+      <div style="flex:1;position:relative">
+        <div style="position:absolute;left:0;right:0;top:${goalY}%;height:1px;background:#e67e22;opacity:0.8;z-index:2;pointer-events:none"></div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:${chartH}px;border-bottom:1px solid #444;border-left:1px solid #444">
           ${mIn.slice(0,cm+1).map((v,i)=>{
             const barH=Math.max((v/maxBar)*chartH,2);
             const barColor=v>=REVENUE_GOAL_MONTHLY?'#27ae60':v>=(REVENUE_GOAL_MONTHLY*0.75)?'#e67e22':'#c0392b';
-            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
-              <span style="font-size:8px;color:#aaa;margin-bottom:2px;white-space:nowrap">${v>0?fmt(v):''}</span>
-              <div style="width:100%;background:${barColor};height:${barH}px;border-radius:2px 2px 0 0;min-height:2px"></div>
+            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0">
+              <span style="font-size:8px;color:#aaa;margin-bottom:1px;white-space:nowrap;overflow:hidden;max-width:100%;text-align:center">${fmt(v)}</span>
+              <div style="width:100%;background:${barColor};height:${barH}px;border-radius:2px 2px 0 0"></div>
             </div>`;
           }).join('')}
         </div>
-        <!-- Month labels -->
-        <div style="display:flex;gap:4px;margin-top:4px">
-          ${months.slice(0,cm+1).map(m=>`<div style="flex:1;text-align:center;font-size:9px;color:#888">${m}</div>`).join('')}
+        <div style="display:flex;gap:3px;margin-top:3px">
+          ${months.slice(0,cm+1).map(m=>`<div style="flex:1;text-align:center;font-size:9px;color:#888;min-width:0">${m}</div>`).join('')}
         </div>
       </div>
     </div>`;
