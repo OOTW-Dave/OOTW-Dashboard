@@ -842,7 +842,15 @@ async function loadRevenueGoal() {
     document.getElementById('s-revgoal').textContent='Loaded';
   } catch(e){document.getElementById('s-revgoal').textContent=`Error: ${e.message}`;}
 }
-
+async function loadAll() {
+  document.getElementById('last-updated').textContent='Refreshing...';
+  await Promise.all([loadPipeline(), loadGP()]);
+  await loadLabor();
+  await loadFinancial();
+  await loadClosingPipeline();
+  await loadRevenueGoal();
+  document.getElementById('last-updated').textContent=`Updated ${new Date().toLocaleTimeString()}`;
+}
  window.addEventListener('DOMContentLoaded', loadAll);
 setInterval(loadAll, 60*60*1000);
 </script>
