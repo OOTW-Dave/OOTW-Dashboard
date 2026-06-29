@@ -143,6 +143,7 @@ loadClosingPipeline()<!DOCTYPE html>
       </div>
     </div>
   </div>
+ <div id="avg-jobsize-area"></div>
 </div>
 
 <div class="spacer"></div>
@@ -191,6 +192,12 @@ loadClosingPipeline()<!DOCTYPE html>
 <!-- ═══ FINANCIAL ═══ -->
 <div class="section">
   <div class="section-title">Financial</div>
+ <div class="grid grid-1" style="margin-bottom:12px">
+  <div class="card">
+    <div class="card-head"><h2>Total Backlog</h2></div>
+    <div id="backlog-area"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+</div>
   <div class="grid grid-2">
     <div class="card">
       <div class="card-head"><h2>Receivables &amp; Unbilled</h2><span class="status" id="s-fin"></span></div>
@@ -674,7 +681,8 @@ async function loadClosingPipeline() {
       </div>`;
     });
 
-    document.getElementById('closing-pipeline-area').innerHTML=html;
+   window._closingTotal = grandTotal; 
+   document.getElementById('closing-pipeline-area').innerHTML=html;
     document.getElementById('s-closing').textContent='Loaded';
   } catch(e){document.getElementById('s-closing').textContent=`Error: ${e.message}`;}
 }
@@ -716,7 +724,8 @@ async function loadFinancial() {
       </tr>`;
     });
     ubHtml+='</tbody></table>';
-    document.getElementById('unbilled-area').innerHTML=ubHtml;
+   window._unbilledTotal = ubRows.reduce((s,r) => s + Math.max(r.unbilled, 0), 0); 
+   document.getElementById('unbilled-area').innerHTML=ubHtml;
 
     const mIn=Array(12).fill(0),mOut=Array(12).fill(0),mLab=Array(12).fill(0),mOvh=Array(12).fill(0);
     let pg=null;
@@ -819,13 +828,100 @@ async function loadRevenueGoal() {
     document.getElementById('s-revgoal').textContent='Loaded';
   } catch(e){document.getElementById('s-revgoal').textContent=`Error: ${e.message}`;}
 }
+
+ // ─── AVG JOB SIZE ────────────────────────────────────────────────────────────
+async function loadJobSize() {
+  try {
+    const thisYear = new Date().getFullYear();
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const cm = new Date().getMonth();
+
+    const res = await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100},nodes:{id:{},projectedPrice:{},customFieldValues:{$:{size:5},nodes:{customField:{id:{}},value:{}}}}}}});
+    const jobs = res.organization.jobs.nodes.filter(j => j.id !== INTERNAL_JOB);
+
+    // Filter to won jobs this year with a valid projectedPrice > 5000
+    const wonByMonth = Array(12).fill(null).map(() => []);
+    jobs.forEach(job => {
+      const status = job.customFieldValues?.nodes?.find(c => c.customField?.id === STATUS_CF)?.value;
+      if (!WON_STATUSES.has(status)) return;
+      const outcome = job.customFieldValues?.nodes?.find(c => c.customField?.id === OUTCOME_DATE_CF)?.value;
+      if (!outcome) return;
+      const dt = new Date(outcome);
+      if (dt.getFullYear() !== thisYear) return;
+      const price = job.projectedPrice || 0;
+      if (price < 5000) return; // exclude tiny/warranty jobs
+      wonByMonth[dt.getMonth()].push(price);
+    });
+
+    // Overall avg
+    const allPrices = wonByMonth.flat();
+    const avgOverall = allPrices.length > 0 ? Math.round(allPrices.reduce((s,v) => s+v, 0) / allPrices.length) : 0;
+    const jobCount = allPrices.length;
+
+    // Monthly trend
+    let trendHtml = '';
+    for (let i = 0; i <= cm; i++) {
+      const prices = wonByMonth[i];
+      if (prices.length === 0) {
+        trendHtml += `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #2a2a2a;font-size:10px"><span style="color:#555">${months[i]}</span><span style="color:#555">—</span></div>`;
+      } else {
+        const avg = Math.round(prices.reduce((s,v) => s+v, 0) / prices.length);
+        trendHtml += `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #2a2a2a;font-size:10px">
+          <span style="color:#888">${months[i]}</span>
+          <span style="color:#ddd">${fmt(avg)}</span>
+          <span style="color:#555;font-size:9px">${prices.length} job${prices.length !== 1 ? 's' : ''}</span>
+        </div>`;
+      }
+    }
+
+    const html = `<div style="margin-top:12px;padding-top:10px;border-top:1px solid #2a2a2a">
+      <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:#aaa;text-transform:uppercase;margin-bottom:8px">Avg Job Size</div>
+      <div style="font-size:28px;font-weight:700;color:#fff;line-height:1">${fmt(avgOverall)}</div>
+      <div style="font-size:10px;color:#888;margin-bottom:10px">${jobCount} won job${jobCount !== 1 ? 's' : ''} YTD</div>
+      ${trendHtml}
+    </div>`;
+
+    document.getElementById('avg-jobsize-area').innerHTML = html;
+  } catch(e) { console.warn('loadJobSize error:', e); }
+}
+
+ 
+ 
+ // ─── BACKLOG ─────────────────────────────────────────────────────────────────
+async function loadBacklog() {
+  try {
+    let attempts = 0;
+    while ((window._closingTotal === undefined || window._unbilledTotal === undefined) && attempts++ < 30) {
+      await new Promise(r => setTimeout(r, 500));
+    }
+    const closing = window._closingTotal || 0;
+    const unbilled = window._unbilledTotal || 0;
+    const total = closing + unbilled;
+
+    document.getElementById('backlog-area').innerHTML = `
+      <div style="font-size:36px;font-weight:700;color:#27ae60;line-height:1;margin-bottom:4px">${fmt(total)}</div>
+      <div style="font-size:10px;color:#888;margin-bottom:14px">Total Committed Backlog</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid #2a2a2a">
+          <span style="color:#aaa">Closing Pipeline</span>
+          <span style="color:#ddd">${fmt(closing)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0">
+          <span style="color:#aaa">Unbilled (In Production)</span>
+          <span style="color:#ddd">${fmt(unbilled)}</span>
+        </div>
+      </div>`;
+  } catch(e) { console.warn('loadBacklog error:', e); }
+}
 async function loadAll() {
   document.getElementById('last-updated').textContent='Refreshing...';
   await Promise.all([loadPipeline(), loadGP()]);
   await loadLabor();
   await loadFinancial();
   await loadClosingPipeline();
+  await loadJobSize();
   await loadRevenueGoal();
+  await loadBacklog();
   document.getElementById('last-updated').textContent=`Updated ${new Date().toLocaleTimeString()}`;
 }
  window.addEventListener('DOMContentLoaded', loadAll);
