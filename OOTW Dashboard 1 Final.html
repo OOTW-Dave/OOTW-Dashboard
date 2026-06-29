@@ -760,13 +760,16 @@ async function loadFinancial() {
 }
 
 // ─── REVENUE GOAL ────────────────────────────────────────────────────────────
+// ─── REVENUE GOAL ────────────────────────────────────────────────────────────
+// Replace the entire loadRevenueGoal() function with this:
+
 async function loadRevenueGoal() {
   document.getElementById('s-revgoal').textContent='Loading...';
   try {
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const cm=new Date().getMonth();
 
-    // Reuse mIn data already fetched by loadFinancial — wait briefly if needed
+    // Reuse mIn data already fetched by loadFinancial
     let attempts=0;
     while(!window._mIn && attempts++<20) await new Promise(r=>setTimeout(r,500));
     const mIn=window._mIn||Array(12).fill(0);
@@ -775,64 +778,67 @@ async function loadRevenueGoal() {
     const ytdGoal=(cm+1)*REVENUE_GOAL_MONTHLY;
     const annualPace=Math.round((ytdRevenue/(cm+1))*12);
     const ytdPct=Math.min(Math.round((ytdRevenue/ytdGoal)*100),999);
-    const maxBar=Math.max(...mIn.slice(0,cm+1),REVENUE_GOAL_MONTHLY,1);
+    const maxBar=Math.max(...mIn.slice(0,cm+1),REVENUE_GOAL_MONTHLY*1.2,1);
+    const chartH=160; // px height of chart area
+    const goalY=100-((REVENUE_GOAL_MONTHLY/maxBar)*100); // % from top where goal line sits
 
-    // YTD summary
-    let html=`<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #333">
-      <div class="fin-stat"><div class="fin-stat-num" style="color:${ytdRevenue>=ytdGoal?'#27ae60':'#e67e22'}">${fmt(ytdRevenue)}</div><div class="fin-stat-label">YTD Revenue</div></div>
-      <div class="fin-stat"><div class="fin-stat-num">${fmt(ytdGoal)}</div><div class="fin-stat-label">YTD Goal</div></div>
-      <div class="fin-stat"><div class="fin-stat-num" style="color:${ytdPct>=100?'#27ae60':ytdPct>=75?'#e67e22':'#c0392b'}">${ytdPct}%</div><div class="fin-stat-label">Of YTD Goal</div></div>
-      <div class="fin-stat"><div class="fin-stat-num">${fmt(annualPace)}</div><div class="fin-stat-label">Annual Pace</div></div>
-      <div class="fin-stat"><div class="fin-stat-num">${fmt(REVENUE_GOAL_MONTHLY*12)}</div><div class="fin-stat-label">Annual Goal</div></div>
+    // YTD summary row
+    let html=`<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #333">
+      <div class="fin-stat">
+        <div class="fin-stat-num" style="color:${ytdRevenue>=ytdGoal?'#27ae60':'#e67e22'}">${fmt(ytdRevenue)}</div>
+        <div class="fin-stat-label">YTD Revenue</div>
+      </div>
+      <div class="fin-stat">
+        <div class="fin-stat-num">${fmt(ytdGoal)}</div>
+        <div class="fin-stat-label">YTD Goal</div>
+      </div>
+      <div class="fin-stat">
+        <div class="fin-stat-num" style="color:${ytdPct>=100?'#27ae60':ytdPct>=75?'#e67e22':'#c0392b'}">${ytdPct}%</div>
+        <div class="fin-stat-label">Of YTD Goal</div>
+      </div>
+      <div class="fin-stat">
+        <div class="fin-stat-num">${fmt(annualPace)}</div>
+        <div class="fin-stat-label">Annual Pace</div>
+      </div>
+      <div class="fin-stat">
+        <div class="fin-stat-num">${fmt(REVENUE_GOAL_MONTHLY*12)}</div>
+        <div class="fin-stat-label">Annual Goal</div>
+      </div>
     </div>`;
 
-    // Monthly actual vs goal bars
-    const goalPct=(REVENUE_GOAL_MONTHLY/maxBar)*100;
-    for(let i=0;i<=cm;i++){
-      const actualPct=Math.max((mIn[i]/maxBar)*100,1);
-      const barColor=mIn[i]>=REVENUE_GOAL_MONTHLY?'#27ae60':mIn[i]>=(REVENUE_GOAL_MONTHLY*0.75)?'#e67e22':'#c0392b';
-      html+=`<div class="cf-row" style="margin-bottom:6px">
-        <div class="cf-label">${months[i]}</div>
-        <div class="cf-group" style="flex-direction:column;gap:3px">
-          <div style="display:flex;align-items:center;gap:6px">
-            <div style="width:8px;font-size:9px;color:#888">A</div>
-            <div style="flex:1;background:#333;border-radius:2px;height:14px;overflow:hidden;position:relative">
-              <div style="width:${actualPct}%;height:14px;background:${barColor};border-radius:2px;display:flex;align-items:center;padding:0 4px">
-                <span style="font-size:9px;color:#fff;white-space:nowrap">${fmt(mIn[i])}</span>
-              </div>
-              <div style="position:absolute;top:0;left:${goalPct}%;width:2px;height:100%;background:#fff;opacity:0.4"></div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div style="width:8px;font-size:9px;color:#888">G</div>
-            <div style="flex:1;background:#333;border-radius:2px;height:6px;overflow:hidden">
-              <div style="width:${goalPct}%;height:6px;background:#555;border-radius:2px"></div>
-            </div>
-            <span style="font-size:9px;color:#666;white-space:nowrap">${fmt(REVENUE_GOAL_MONTHLY)}</span>
-          </div>
+    // Vertical bar chart
+    html+=`<div style="position:relative;padding:0 8px">
+      <!-- Y-axis labels -->
+      <div style="position:absolute;left:0;top:0;bottom:24px;width:48px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:6px">
+        <span style="font-size:9px;color:#666">${fmt(maxBar)}</span>
+        <span style="font-size:9px;color:#e67e22">${fmt(REVENUE_GOAL_MONTHLY)}</span>
+        <span style="font-size:9px;color:#666">$0</span>
+      </div>
+      <!-- Chart area -->
+      <div style="margin-left:52px;position:relative">
+        <!-- Goal line -->
+        <div style="position:absolute;left:0;right:0;top:${goalY}%;height:2px;background:#e67e22;opacity:0.7;z-index:2">
+          <span style="position:absolute;right:0;top:-14px;font-size:9px;color:#e67e22;white-space:nowrap">Goal ${fmt(REVENUE_GOAL_MONTHLY)}</span>
         </div>
-        <div class="cf-total" style="color:${mIn[i]>=REVENUE_GOAL_MONTHLY?'#27ae60':mIn[i]>=(REVENUE_GOAL_MONTHLY*0.75)?'#e67e22':'#c0392b'}">${mIn[i]>=REVENUE_GOAL_MONTHLY?'✓':fmt(mIn[i]-REVENUE_GOAL_MONTHLY)}</div>
-      </div>`;
-    }
+        <!-- Bars -->
+        <div style="display:flex;align-items:flex-end;gap:4px;height:${chartH}px;border-bottom:1px solid #444;border-left:1px solid #444">
+          ${mIn.slice(0,cm+1).map((v,i)=>{
+            const barH=Math.max((v/maxBar)*chartH,2);
+            const barColor=v>=REVENUE_GOAL_MONTHLY?'#27ae60':v>=(REVENUE_GOAL_MONTHLY*0.75)?'#e67e22':'#c0392b';
+            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">
+              <span style="font-size:8px;color:#aaa;margin-bottom:2px;white-space:nowrap">${v>0?fmt(v):''}</span>
+              <div style="width:100%;background:${barColor};height:${barH}px;border-radius:2px 2px 0 0;min-height:2px"></div>
+            </div>`;
+          }).join('')}
+        </div>
+        <!-- Month labels -->
+        <div style="display:flex;gap:4px;margin-top:4px">
+          ${months.slice(0,cm+1).map(m=>`<div style="flex:1;text-align:center;font-size:9px;color:#888">${m}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
 
     document.getElementById('revenue-goal-area').innerHTML=html;
     document.getElementById('s-revgoal').textContent='Loaded';
   } catch(e){document.getElementById('s-revgoal').textContent=`Error: ${e.message}`;}
 }
-
-async function loadAll() {
-  document.getElementById('last-updated').textContent='Refreshing...';
-  await Promise.all([loadPipeline(), loadGP()]);
-  await loadLabor();
-  await loadFinancial();
-  await loadClosingPipeline();
-  await loadRevenueGoal();
-  document.getElementById('last-updated').textContent=`Updated ${new Date().toLocaleTimeString()}`;
-}
-
-window.addEventListener('DOMContentLoaded', loadAll);
-setInterval(loadAll, 60*60*1000);
-</script>
-</body>
-</html>
-</html>
