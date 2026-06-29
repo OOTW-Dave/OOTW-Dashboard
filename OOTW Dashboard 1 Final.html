@@ -842,3 +842,9 @@ async function loadRevenueGoal() {
     document.getElementById('s-revgoal').textContent='Loaded';
   } catch(e){document.getElementById('s-revgoal').textContent=`Error: ${e.message}`;}
 }
+
+ window.addEventListener('DOMContentLoaded', loadAll);
+setInterval(loadAll, 60*60*1000);
+</script>
+</body>
+</html>
