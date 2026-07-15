@@ -8,49 +8,49 @@ loadClosingPipeline()<!DOCTYPE html>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #fff; }
   .top { background: #1a1a1a; color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .top h1 { font-size: 15px; font-weight: 500; letter-spacing: 0.02em; }
+  .top h1 { font-size:15px; font-weight: 500; letter-spacing: 0.02em; }
   .top-right { display: flex; align-items: center; gap: 16px; }
-  .top span { font-size: 12px; color: #888; }
-  .btn { padding: 6px 14px; font-size: 12px; border-radius: 6px; border: 1px solid #444; cursor: pointer; background: transparent; color: #ccc; font-family: inherit; }
+  .top span { font-size:12px; color: #888; }
+  .btn { padding: 6px 14px; font-size:12px; border-radius: 6px; border: 1px solid #444; cursor: pointer; background: transparent; color: #ccc; font-family: inherit; }
   .btn:hover { background: #333; color: #fff; }
 
   /* Layout */
   .section { padding: 20px 24px 0; max-width: 1400px; margin: 0 auto; }
-  .section-title { font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+  .section-title { font-size:13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
   .grid { display: grid; gap: 14px; }
   .spacer { height: 20px; }
 
   /* Cards */
   .card { background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a; overflow: hidden; }
   .card-head { padding: 12px 16px; border-bottom: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: space-between; }
-  .card-head h2 { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; }
-  .status { font-size: 10px; color: #bbb; }
+  .card-head h2 { font-size:13px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; }
+  .status { font-size:12px; color: #bbb; }
 
   /* Big stat cards */
   .stat-card { display: flex; flex-direction: column; justify-content: center; padding: 20px; }
-  .stat-card-value { font-size: 48px; font-weight: 200; line-height: 1; letter-spacing: -0.02em; color: #fff; }
-  .stat-card-label { font-size: 10px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; }
-  .stat-card-sub { font-size: 11px; color: #999; margin-top: 4px; }
+  .stat-card-value { font-size:48px; font-weight: 200; line-height: 1; letter-spacing: -0.02em; color: #fff; }
+  .stat-card-label { font-size:12px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; }
+  .stat-card-sub { font-size:13px; color: #999; margin-top: 4px; }
 
 
   /* Pipeline bars — taller, more visual */
   .pl-chart { padding: 14px 16px; }
   .pl-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .pl-label { font-size: 11px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; font-size:13px; }
+  .pl-label { font-size:13px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; font-size:13px; }
   .pl-track { flex: 1; background: #222; border-radius: 6px; height: 28px; overflow: hidden; }
   .pl-fill { height: 28px; border-radius: 6px; background: #fff; display: flex; align-items: center; padding-left: 10px; min-width: 32px; transition: width 0.5s ease; }
-  .pl-fill span { font-size: 13px; color: #000; font-weight: 600; }
+  .pl-fill span { font-size:13px; color: #000; font-weight: 600; }
 
   /* Pie */
   .pie-wrap { padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
   .legend { display: flex; flex-direction: column; gap: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size:13px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .legend-value { font-weight: 700; margin-left: auto; padding-left: 12px; font-size: 15px; }
+  .legend-value { font-weight: 700; margin-left: auto; padding-left: 12px; font-size:15px; }
 
   /* Tables */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { padding: 8px 10px; text-align: right; font-weight: 600; color: #bbb; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #2a2a2a; background: #222; }
+  table { width: 100%; border-collapse: collapse; font-size:13px; }
+  thead th { padding: 8px 10px; text-align: right; font-weight: 600; color: #bbb; font-size:13px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #2a2a2a; background: #222; }
   thead th:first-child { text-align: left; }
   td { padding: 9px 10px; text-align: right; border-bottom: 1px solid #222; vertical-align: middle; }
   td:first-child { text-align: left; font-weight: 500; color: #fff; font-size:13px; }
@@ -70,31 +70,31 @@ loadClosingPipeline()<!DOCTYPE html>
 
   /* Tabs */
   .tabs { display: flex; gap: 0; padding: 0 16px; margin-bottom: -1px; }
-  .tab { padding: 7px 18px; font-size: 12px; cursor: pointer; border: 1px solid #2a2a2a; border-bottom: none; border-radius: 6px 6px 0 0; background: #111; color: #aaa; font-family: inherit; }
+  .tab { padding: 7px 18px; font-size:12px; cursor: pointer; border: 1px solid #2a2a2a; border-bottom: none; border-radius: 6px 6px 0 0; background: #111; color: #aaa; font-family: inherit; }
   .tab.active { background: #1a1a1a; color: #fff; font-weight: 600; border-bottom: 1px solid #1a1a1a; }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
   /* Cash flow */
   .cf-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-  .cf-label { font-size: 11px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; font-size:13px; }
+  .cf-label { font-size:13px; color: #666; width: 28px; text-align: right; flex-shrink: 0; font-weight: 500; color: #fff; font-size:13px; }
   .cf-group { flex: 1; display: flex; flex-direction: column; gap: 3px; }
   .cf-track { background: #222; border-radius: 3px; height: 14px; overflow: hidden; }
   .cf-fill { height: 14px; border-radius: 3px; display: flex; align-items: center; padding: 0 6px; min-width: 3px; }
-  .cf-fill span { font-size: 10px; color: #fff; font-weight: 600; white-space: nowrap; overflow: hidden; }
-  .cf-total { font-size: 11px; color: #555; white-space: nowrap; padding-left: 6px; font-weight: 500; min-width: 80px; text-align: right; }
+  .cf-fill span { font-size:12px; color: #fff; font-weight: 600; white-space: nowrap; overflow: hidden; }
+  .cf-total { font-size:15px; color: #eee; white-space: nowrap; padding-left: 6px; font-weight: 700; min-width: 110px; text-align: right; display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
   .bar-legend { display: flex; gap: 14px; padding: 6px 16px 14px; }
-  .bar-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #bbb; }
+  .bar-legend-item { display: flex; align-items: center; gap: 5px; font-size:12px; color: #bbb; }
   .bar-legend-dot { width: 9px; height: 9px; border-radius: 2px; }
 
   /* Financial stats */
   .fin-stats { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #2a2a2a; }
   .fin-stat { padding: 16px 20px; border-right: 1px solid #2a2a2a; }
   .fin-stat:last-child { border-right: none; }
-  .fin-stat-num { font-size: 28px; font-weight: 200; color: #fff; }
-  .fin-stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+  .fin-stat-num { font-size:28px; font-weight: 200; color: #fff; }
+  .fin-stat-label { font-size:13px; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
 
-  .loading { padding: 30px; text-align: center; color: #bbb; font-size: 13px; }
+  .loading { padding: 30px; text-align: center; color: #bbb; font-size:13px; }
   .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #ddd; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
@@ -117,11 +117,11 @@ loadClosingPipeline()<!DOCTYPE html>
       <div class="card-head"><h2>New Leads &amp; Active Pipeline</h2><span class="status" id="s-leads"></span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid #2a2a2a">
         <div style="border-right:1px solid #2a2a2a">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#bbb;padding:10px 16px 6px">Leads per Month (YTD)</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#d5d5d5;padding:10px 16px 6px">Leads per Month (YTD)</div>
           <div class="pl-chart" id="leads-chart"><div class="loading"><span class="spinner"></span></div></div>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#bbb;padding:10px 16px 6px">Active Pipeline by Stage</div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#d5d5d5;padding:10px 16px 6px">Active Pipeline by Stage</div>
           <div class="pl-chart" id="funnel-chart"><div class="loading"><span class="spinner"></span></div></div>
         </div>
       </div>
@@ -143,7 +143,6 @@ loadClosingPipeline()<!DOCTYPE html>
       </div>
     </div>
   </div>
- <div id="avg-jobsize-area"></div>
 </div>
 
 <div class="spacer"></div>
@@ -157,11 +156,11 @@ loadClosingPipeline()<!DOCTYPE html>
       <div id="gp-table"><div class="loading"><span class="spinner"></span></div></div>
     </div>
     <div class="card stat-card" style="align-items:center;text-align:center">
-      <div style="font-size:11px;color:#ccc;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Avg GP%</div>
+      <div style="font-size:13px;color:#e0e0e0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Avg GP%</div>
       <div id="avg-gp" class="stat-card-value" style="font-size:38px">—</div>
       <div class="stat-card-sub">In Production</div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid #2a2a2a;width:100%">
-        <div style="font-size:11px;color:#ccc;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Avg GP% YTD</div>
+        <div style="font-size:13px;color:#e0e0e0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Avg GP% YTD</div>
         <div id="avg-gp-ytd" class="stat-card-value" style="font-size:38px">—</div>
         <div class="stat-card-sub">Completed Jobs</div>
       </div>
@@ -219,11 +218,12 @@ loadClosingPipeline()<!DOCTYPE html>
   <div class="grid grid-1">
     <div class="card">
       <div class="card-head"><h2>Cash In vs Out — YTD</h2></div>
-      <div style="padding:6px 16px 0;font-size:10px;color:#ccc">Labor from JT time entries at burdened rates. Payroll taxes &amp; overhead not included.</div>
+      <div style="padding:6px 16px 0;font-size:12px;color:#e0e0e0">Labor from JT time entries at burdened rates. Payroll taxes &amp; overhead not included.</div>
       <div style="padding:6px 16px 8px;display:flex;gap:16px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:5px;font-size:10px"><div style="width:10px;height:10px;background:#27ae60;border-radius:2px"></div>Cash In (Invoices)</div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:10px"><div style="width:10px;height:10px;background:#c0392b;border-radius:2px"></div>Direct Job Costs (Bills + Labor)</div>
-        <div style="display:flex;align-items:center;gap:5px;font-size:10px"><div style="width:10px;height:10px;background:#8e44ad;border-radius:2px"></div>Overhead (Salaries + Expenses)</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div style="width:10px;height:10px;background:#27ae60;border-radius:2px"></div>Cash In (Invoices)</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div style="width:10px;height:10px;background:#c0392b;border-radius:2px"></div>Vendor Bills</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div style="width:10px;height:10px;background:#e67e22;border-radius:2px"></div>Labor</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px"><div style="width:10px;height:10px;background:#8e44ad;border-radius:2px"></div>Overhead (Salaries + Expenses)</div>
       </div>
       <div id="cashflow-chart"><div class="loading"><span class="spinner"></span></div></div>
     </div>
@@ -346,11 +346,11 @@ async function loadPipeline() {
     const ytdLeads = monthCounts.slice(0, currentMonth + 1).reduce((s, v) => s + v, 0);
     const ytdLeadGoal = (currentMonth + 1) * LEAD_GOAL;
     const leadPace = Math.round((ytdLeads / (currentMonth + 1)) * 12);
-    leadsHtml += `<div style="margin-top:10px;padding-top:8px;border-top:1px solid #333;display:flex;gap:20px;font-size:10px;color:#ccc">
+    leadsHtml += `<div style="margin-top:10px;padding-top:8px;border-top:1px solid #333;display:flex;gap:20px;font-size:12px;color:#e0e0e0">
       <div><span style="color:#fff;font-weight:700">${ytdLeads}</span> leads YTD</div>
       <div>Goal: <span style="${ytdLeads >= ytdLeadGoal ? 'color:#27ae60' : 'color:#e67e22'};font-weight:700">${ytdLeadGoal}</span></div>
       <div>Annual pace: <span style="color:#fff;font-weight:700">${leadPace}</span></div>
-      <div style="margin-left:auto;color:#999;font-size:9px">goal line = ${LEAD_GOAL}/mo</div>
+      <div style="margin-left:auto;color:#c2c2c2;font-size:11px">goal line = ${LEAD_GOAL}/mo</div>
     </div>`;
     document.getElementById('leads-chart').innerHTML = leadsHtml;
 
@@ -367,7 +367,7 @@ async function loadPipeline() {
       const count = stageCounts[s.key] || 0;
       const pct = (count / maxStage) * 100;
       funnelHtml += `<div class="pl-row">
-        <div class="pl-label" style="width:110px;font-size:11px;color:#ccc">${s.label}</div>
+        <div class="pl-label" style="width:110px;font-size:13px;color:#e0e0e0">${s.label}</div>
         <div class="pl-track"><div class="pl-fill" style="width:${Math.max(pct,6)}%;background:${s.color}"><span>${count}</span></div></div>
       </div>`;
     });
@@ -394,8 +394,8 @@ async function loadPipeline() {
     else{const wd=wonPct*360;svg+=arc(0,wd,'#27ae60')+arc(wd,360,'#c0392b');}
     svg+='</svg>';
     document.getElementById('wonlost-chart').innerHTML=`${svg}<div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div><span style="color:#555">Won</span><span class="legend-value" style="color:#27ae60">${won}</span></div>
-      <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div><span style="color:#555">Lost</span><span class="legend-value" style="color:#c0392b">${lost}</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div><span style="color:#8a8a8a">Won</span><span class="legend-value" style="color:#27ae60">${won}</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div><span style="color:#8a8a8a">Lost</span><span class="legend-value" style="color:#c0392b">${lost}</span></div>
     </div>`;
 
     // Win rate stat card
@@ -581,7 +581,7 @@ async function loadClosingPipeline() {
 
     // Step 2: For each closing job, fetch budget data and apply stage logic
     const buckets={};
-    CLOSING_STAGES.forEach(s=>{buckets[s.key]={total:0,count:0};});
+    CLOSING_STAGES.forEach(s=>{buckets[s.key]={total:0,count:0,names:[]};});
 
     for(const job of closingJobs){
       // Fetch cost groups, total cost items, and document data in one call
@@ -644,8 +644,10 @@ async function loadClosingPipeline() {
         value=largestDocPrice;
       }
 
+      if(!buckets[job.stage]) buckets[job.stage]={total:0,count:0,names:[]};
       buckets[job.stage].total+=value;
       buckets[job.stage].count++;
+      buckets[job.stage].names.push({name:job.name,value});
     }
 
     // Render the tile
@@ -654,7 +656,7 @@ async function loadClosingPipeline() {
     const maxVal=Math.max(...CLOSING_STAGES.map(s=>buckets[s.key].total),1);
 
     if(grandCount===0){
-      document.getElementById('closing-pipeline-area').innerHTML='<div style="color:#bbb;text-align:center;padding:20px">No active deals in closing stages</div>';
+      document.getElementById('closing-pipeline-area').innerHTML='<div style="color:#d5d5d5;text-align:center;padding:20px">No active deals in closing stages</div>';
       document.getElementById('s-closing').textContent='Loaded';
       return;
     }
@@ -668,8 +670,9 @@ async function loadClosingPipeline() {
       const b=buckets[stage.key];
       if(b.count===0)return;
       const pct=Math.max((b.total/maxVal)*100,2);
+      const namesList=b.names.map(n=>`${n.name} (${fmt(n.value)})`).join(' &nbsp;&bull;&nbsp; ');
       html+=`<div class="cf-row">
-        <div class="cf-label" style="width:170px;font-size:10px">${stage.label}</div>
+        <div class="cf-label" style="width:170px;font-size:12px">${stage.label}</div>
         <div class="cf-group" style="flex:1">
           <div class="cf-track">
             <div class="cf-fill" style="width:${pct}%;background:${stage.color}">
@@ -677,8 +680,9 @@ async function loadClosingPipeline() {
             </div>
           </div>
         </div>
-        <div class="cf-total" style="font-size:10px;color:#bbb">${b.count} job${b.count!==1?'s':''}</div>
-      </div>`;
+        <div class="cf-total" style="font-size:12px;color:#d5d5d5">${b.count} job${b.count!==1?'s':''}</div>
+      </div>
+      <div style="padding:0 0 10px 170px;font-size:12px;color:#a3a3a3">${namesList}</div>`;
     });
 
    window._closingTotal = grandTotal; 
@@ -728,9 +732,11 @@ async function loadFinancial() {
    document.getElementById('unbilled-area').innerHTML=ubHtml;
 
     const mIn=Array(12).fill(0),mOut=Array(12).fill(0),mLab=Array(12).fill(0),mOvh=Array(12).fill(0);
+    let closedJobRevenueYTD=0;
     let pg=null;
-    do{const r=await query({organization:{$:{id:ORG_ID},documents:{$:{size:100,...(pg?{page:pg}:{}),where:{and:[{'=':[{field:['type']},{value:'customerInvoice'}]},{'=':[{field:['status']},{value:'approved'}]},{between:[{field:['closedAt']},[{datetime:{startOf:'year'}},{datetime:{endOf:'year'}}]]}]}},nextPage:{},nodes:{amountPaid:{},closedAt:{}}}}});
-    r.organization.documents.nodes.forEach(d=>{const m=new Date(d.closedAt).getMonth();mIn[m]+=d.amountPaid||0;});pg=r.organization.documents.nextPage||null;}while(pg);
+    do{const r=await query({organization:{$:{id:ORG_ID},documents:{$:{size:100,...(pg?{page:pg}:{}),where:{and:[{'=':[{field:['type']},{value:'customerInvoice'}]},{'=':[{field:['status']},{value:'approved'}]},{between:[{field:['closedAt']},[{datetime:{startOf:'year'}},{datetime:{endOf:'year'}}]]}]}},nextPage:{},nodes:{amountPaid:{},closedAt:{},job:{closedOn:{}}}}}});
+    r.organization.documents.nodes.forEach(d=>{const m=new Date(d.closedAt).getMonth();mIn[m]+=d.amountPaid||0;if(d.job?.closedOn){closedJobRevenueYTD+=d.amountPaid||0;}});pg=r.organization.documents.nextPage||null;}while(pg);
+    window._closedJobRevenueYTD=closedJobRevenueYTD;
     pg=null;
     do{const r=await query({organization:{$:{id:ORG_ID},documents:{$:{size:100,...(pg?{page:pg}:{}),where:{and:[{'=':[{field:['type']},{value:'vendorBill'}]},{'=':[{field:['status']},{value:'approved'}]},{between:[{field:['closedAt']},[{datetime:{startOf:'year'}},{datetime:{endOf:'year'}}]]}]}},nextPage:{},nodes:{amountPaid:{},closedAt:{}}}}});
     r.organization.documents.nodes.forEach(d=>{const m=new Date(d.closedAt).getMonth();mOut[m]+=d.amountPaid||0;});pg=r.organization.documents.nextPage||null;}while(pg);
@@ -746,22 +752,34 @@ async function loadFinancial() {
 
     // Store mIn on window so loadRevenueGoal can use it without re-fetching
     window._mIn=mIn;
+    window._mOut=mOut;
+    window._mLab=mLab;
+    window._mOvh=mOvh;
 
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const cm=new Date().getMonth();
     const maxV=Math.max(...mIn.slice(0,cm+1),...mOut.slice(0,cm+1),...mLab.slice(0,cm+1),...mOvh.slice(0,cm+1),1);
 
-    let cfHtml='';
+    const ytdNet=mIn.slice(0,cm+1).reduce((s,v)=>s+v,0)-(mOut.slice(0,cm+1).reduce((s,v)=>s+v,0)+mLab.slice(0,cm+1).reduce((s,v)=>s+v,0)+mOvh.slice(0,cm+1).reduce((s,v)=>s+v,0));
+    let cfHtml=`<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 0 8px">
+      <div style="font-size:13px;color:#c2c2c2">YTD Net (Cash In &minus; Cash Out)</div>
+      <div style="font-size:16px;font-weight:700;color:${ytdNet>=0?'#27ae60':'#c0392b'}">${ytdNet>=0?'+':'-'}${fmt(Math.abs(ytdNet))}</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;padding:0 0 4px;font-size:13px;color:#a3a3a3;text-transform:uppercase;letter-spacing:0.05em">Total Cash Out &nbsp;|&nbsp; Month Surplus/Shortfall (% Covered) &nbsp;|&nbsp; Running YTD</div>`;
+    let runningDiff=0;
     for(let i=0;i<=cm;i++){
       const ip=(mIn[i]/maxV)*100,bp=(mOut[i]/maxV)*100,lp=(mLab[i]/maxV)*100,op=(mOvh[i]/maxV)*100,tot=mOut[i]+mLab[i]+mOvh[i];
+      const diff=mIn[i]-tot;
+      runningDiff+=diff;
+      const covPct=tot>0?Math.round((mIn[i]/tot)*100):(mIn[i]>0?999:100);
       cfHtml+=`<div class="cf-row"><div class="cf-label">${months[i]}</div><div class="cf-group">
         <div class="cf-track"><div class="cf-fill" style="width:${Math.max(ip,1)}%;background:#27ae60"><span>${fmt(mIn[i])}</span></div></div>
         <div class="cf-track" style="display:flex;overflow:hidden;border-radius:2px">
-          <div style="width:${bp}%;background:#c0392b;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:9px;color:#fff;white-space:nowrap;overflow:hidden">${mOut[i]>5000?fmt(mOut[i]):''}</span></div>
-          <div style="width:${lp}%;background:#e67e22;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:9px;color:#fff;white-space:nowrap;overflow:hidden">${mLab[i]>5000?fmt(mLab[i]):''}</span></div>
-          <div style="width:${op}%;background:#8e44ad;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:9px;color:#fff;white-space:nowrap;overflow:hidden">${mOvh[i]>5000?fmt(mOvh[i]):''}</span></div>
+          <div style="width:${bp}%;background:#c0392b;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:13px;color:#fff;white-space:nowrap;overflow:hidden">${mOut[i]>5000?fmt(mOut[i]):''}</span></div>
+          <div style="width:${lp}%;background:#e67e22;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:13px;color:#fff;white-space:nowrap;overflow:hidden">${mLab[i]>5000?fmt(mLab[i]):''}</span></div>
+          <div style="width:${op}%;background:#8e44ad;height:14px;display:flex;align-items:center;padding:0 4px;flex-shrink:0"><span style="font-size:13px;color:#fff;white-space:nowrap;overflow:hidden">${mOvh[i]>5000?fmt(mOvh[i]):''}</span></div>
         </div>
-      </div><div class="cf-total">${fmt(tot)}</div></div>`;
+      </div><div class="cf-total"><div>${fmt(tot)}</div><div style="font-size:13px;font-weight:600;color:${diff>=0?'#27ae60':'#c0392b'}">${diff>=0?'+':'-'}${fmt(Math.abs(diff))} (${covPct}%)</div><div style="font-size:13px;font-weight:600;color:${runningDiff>=0?'#5dbb7a':'#e07a6e'}">YTD: ${runningDiff>=0?'+':'-'}${fmt(Math.abs(runningDiff))}</div></div></div>`;
     }
     document.getElementById('cashflow-chart').innerHTML=cfHtml;
     document.getElementById('s-fin').textContent='Loaded';
@@ -774,6 +792,111 @@ async function loadFinancial() {
 
 // Replace the entire loadRevenueGoal() function with this:
 
+// ─── BUSINESS MODEL HEALTH (42% MARKUP CHECK) ─────────────────────────────────
+async function loadBusinessModel() {
+  document.getElementById('s-bizmodel').textContent='Loading...';
+  try {
+    const cm=new Date().getMonth();
+    let attempts=0;
+    while(!window._mIn && attempts++<20) await new Promise(r=>setTimeout(r,500));
+    const mIn=window._mIn||Array(12).fill(0);
+    const mOut=window._mOut||Array(12).fill(0);
+    const mLab=window._mLab||Array(12).fill(0);
+    const mOvh=window._mOvh||Array(12).fill(0);
+
+    const ytdCashIn=mIn.slice(0,cm+1).reduce((s,v)=>s+v,0);
+    const ytdDirectCost=mOut.slice(0,cm+1).reduce((s,v)=>s+v,0)+mLab.slice(0,cm+1).reduce((s,v)=>s+v,0);
+    const ytdOverhead=mOvh.slice(0,cm+1).reduce((s,v)=>s+v,0);
+
+    const realizedMarkupPct=ytdDirectCost>0?((ytdCashIn-ytdDirectCost)/ytdDirectCost*100):0;
+    const overheadPct=ytdDirectCost>0?(ytdOverhead/ytdDirectCost*100):0;
+    const effectiveProfitPct=realizedMarkupPct-overheadPct;
+
+    const TARGET_MARKUP=42,TARGET_OVERHEAD=32,TARGET_PROFIT=10;
+
+    // Annualized run-rate view: at this pace, what would the full year need to look like
+    const monthsElapsed=cm+1;
+    const annualizedDirectCost=ytdDirectCost/monthsElapsed*12;
+    const annualizedOverhead=ytdOverhead/monthsElapsed*12;
+    const revenueBreakEvenFull=annualizedDirectCost+annualizedOverhead;
+    const revenueProfitFull=annualizedDirectCost*(1+TARGET_PROFIT/100)+annualizedOverhead;
+    const pipelineTotal=window._closingTotal||0;
+    const projectedPaceOnly=ytdCashIn/monthsElapsed*12;
+    const projectedWithPipeline=projectedPaceOnly+pipelineTotal;
+    const annualGoal=REVENUE_GOAL_MONTHLY*12;
+    const gapVsBreakEven=projectedWithPipeline-revenueBreakEvenFull;
+    const gapVsProfit=projectedWithPipeline-revenueProfitFull;
+    const goalGapVsProfit=annualGoal-revenueProfitFull;
+
+    const verdictColor=effectiveProfitPct>=TARGET_PROFIT?'#27ae60':effectiveProfitPct>=0?'#e67e22':'#c0392b';
+    const verdictText=effectiveProfitPct>=TARGET_PROFIT
+      ?`On target — the 42% markup is covering overhead and hitting the 10% profit goal.`
+      :effectiveProfitPct>=0
+      ?`Below target — overhead is covered, but there's less profit left than the 10% goal.`
+      :`Underwater — overhead alone is eating more than the markup brings in. No profit left YTD.`;
+
+    function twoBarRow(label,actual,target,lowerIsBetter,ceiling){
+      const scaleMax=Math.max(Math.abs(actual),target,ceiling||0,1)*1.15;
+      const actualW=Math.max(0,Math.min((Math.abs(actual)/scaleMax)*100,100));
+      const targetW=Math.min((target/scaleMax)*100,100);
+      let barColor;
+      if(lowerIsBetter){barColor=actual<=target?'#27ae60':actual<=(ceiling||target*1.3)?'#e67e22':'#c0392b';}
+      else{barColor=actual>=target?'#27ae60':actual>=target*0.75?'#e67e22':'#c0392b';}
+      return `<div style="margin-bottom:14px">
+        <div style="font-size:13px;color:#e0e0e0;margin-bottom:5px">${label}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <div style="width:46px;font-size:13px;color:#c2c2c2;text-align:right;flex-shrink:0">Actual</div>
+          <div style="flex:1;height:14px;background:#2a2a2a;border-radius:3px;overflow:hidden"><div style="height:100%;width:${actualW}%;background:${barColor};border-radius:3px"></div></div>
+          <div style="width:60px;font-size:12px;color:${barColor};text-align:right;flex-shrink:0;font-weight:700">${actual>=0?'':'-'}${Math.abs(actual).toFixed(1)}%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:46px;font-size:13px;color:#c2c2c2;text-align:right;flex-shrink:0">Target</div>
+          <div style="flex:1;height:14px;background:#2a2a2a;border-radius:3px;overflow:hidden"><div style="height:100%;width:${targetW}%;background:#666;border-radius:3px"></div></div>
+          <div style="width:60px;font-size:12px;color:#eeeeee;text-align:right;flex-shrink:0">${target.toFixed(0)}%</div>
+        </div>
+      </div>`;
+    }
+
+    let html=`<div style="padding:16px">
+      <div style="font-size:13px;font-weight:600;color:${verdictColor};margin-bottom:4px">${verdictText}</div>
+      <div style="font-size:30px;font-weight:700;color:${verdictColor};margin-bottom:16px">Effective Profit: ${effectiveProfitPct>=0?'+':'-'}${Math.abs(effectiveProfitPct).toFixed(1)}%</div>
+      ${twoBarRow('Markup Realized on Invoices (revenue vs. direct cost)',realizedMarkupPct,TARGET_MARKUP,false)}
+      ${twoBarRow('Overhead Consumed (% of direct cost)',overheadPct,TARGET_OVERHEAD,true,TARGET_MARKUP)}
+      <div style="font-size:13px;color:#a3a3a3;margin-top:-4px;margin-bottom:14px;line-height:1.5">Effective Profit = Markup Realized &minus; Overhead Consumed. Plain terms: for every $100 of job cost, invoices bill $${(100+realizedMarkupPct).toFixed(0)}; overhead consumes $${overheadPct.toFixed(0)} of that markup; leaving $${effectiveProfitPct.toFixed(0)} in profit, vs. the $${TARGET_PROFIT.toFixed(0)} target. Based on YTD cumulative totals (not single months) since invoices and costs don't always land in the same month.</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;padding-top:12px;border-top:1px solid #333;font-size:13px;color:#a3a3a3">
+        <div>YTD Cash In: <span style="color:#e0e0e0">${fmt(ytdCashIn)}</span></div>
+        <div>YTD Direct Cost: <span style="color:#e0e0e0">${fmt(ytdDirectCost)}</span></div>
+        <div>YTD Overhead: <span style="color:#e0e0e0">${fmt(ytdOverhead)}</span></div>
+      </div>
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid #333">
+        <div style="font-size:14px;font-weight:600;color:#e0e0e0;margin-bottom:4px">At This Overhead Pace, What Does the Full Year Actually Need?</div>
+        <div style="font-size:13px;color:#a3a3a3;margin-bottom:12px;line-height:1.5">Taking YTD Direct Cost and Overhead and running them at the same monthly rate for all 12 months (not just what's happened so far):</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;color:#a3a3a3">
+          <div>Annualized Direct Cost: <span style="color:#e0e0e0;font-weight:600">${fmt(annualizedDirectCost)}</span></div>
+          <div>Annualized Overhead: <span style="color:#e0e0e0;font-weight:600">${fmt(annualizedOverhead)}</span></div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+          <div style="flex:1;min-width:220px;background:#1c1c1c;border-radius:6px;padding:12px 14px">
+            <div style="font-size:11px;color:#a3a3a3;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Revenue to Break Even (full year)</div>
+            <div style="font-size:20px;font-weight:700;color:#e0e0e0">${fmt(revenueBreakEvenFull)}</div>
+          </div>
+          <div style="flex:1;min-width:220px;background:#1c1c1c;border-radius:6px;padding:12px 14px">
+            <div style="font-size:11px;color:#a3a3a3;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Revenue for 10% Profit (full year)</div>
+            <div style="font-size:20px;font-weight:700;color:#e0e0e0">${fmt(revenueProfitFull)}</div>
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:1.7">
+          <div>Projected Year-End (Pace + Pipeline): <span style="color:#e0e0e0;font-weight:600">${fmt(projectedWithPipeline)}</span> &mdash; <span style="color:${gapVsBreakEven>=0?'#27ae60':'#c0392b'}">${gapVsBreakEven>=0?'+':'-'}${fmt(Math.abs(gapVsBreakEven))} vs. break-even</span>, <span style="color:${gapVsProfit>=0?'#27ae60':'#c0392b'}">${gapVsProfit>=0?'+':'-'}${fmt(Math.abs(gapVsProfit))} vs. the 10% profit target</span></div>
+          <div>Annual Goal ($${(annualGoal/1000000).toFixed(1)}M): <span style="color:${goalGapVsProfit>=0?'#27ae60':'#c0392b'}">${goalGapVsProfit>=0?'+':'-'}${fmt(Math.abs(goalGapVsProfit))} vs. the 10% profit target</span> if fully hit</div>
+        </div>
+      </div>
+    </div>`;
+
+    document.getElementById('bizmodel-area').innerHTML=html;
+    document.getElementById('s-bizmodel').textContent='Loaded';
+  } catch(e){document.getElementById('s-bizmodel').textContent=`Error: ${e.message}`;}
+}
+
 async function loadRevenueGoal() {
   document.getElementById('s-revgoal').textContent='Loading...';
   try {
@@ -784,27 +907,92 @@ async function loadRevenueGoal() {
     while(!window._mIn && attempts++<20) await new Promise(r=>setTimeout(r,500));
     const mIn=window._mIn||Array(12).fill(0);
 
+    // Honest YTD figure: actual invoiced revenue, no blending
     const ytdRevenue=mIn.slice(0,cm+1).reduce((s,v)=>s+v,0);
-    const ytdGoal=(cm+1)*REVENUE_GOAL_MONTHLY;
     const annualPace=Math.round((ytdRevenue/(cm+1))*12);
+
+    // Projection now folds in the signed pipeline, since that's real work not yet invoiced
+    const pipelineTotal=window._closingTotal||0;
+    const projectedWithPipeline=annualPace+pipelineTotal;
+    const annualGoal=REVENUE_GOAL_MONTHLY*12;
+    const projPct=Math.min(Math.round((projectedWithPipeline/annualGoal)*100),999);
+
+    const ytdGoal=(cm+1)*REVENUE_GOAL_MONTHLY;
     const ytdPct=Math.min(Math.round((ytdRevenue/ytdGoal)*100),999);
+    const variance=ytdRevenue-ytdGoal;
+    const varianceAhead=variance>=0;
+    const barColor=ytdPct>=100?'#27ae60':ytdPct>=75?'#e67e22':'#c0392b';
+    const scaleMax=Math.max(ytdRevenue,ytdGoal,1)*1.1;
+    const revBarPct=Math.min((ytdRevenue/scaleMax)*100,100);
+    const goalBarPct=Math.min((ytdGoal/scaleMax)*100,100);
     const maxBar=Math.max(...mIn.slice(0,cm+1),REVENUE_GOAL_MONTHLY*1.2,1);
     const chartH=180;
     const goalY=100-((REVENUE_GOAL_MONTHLY/maxBar)*100);
 
-    let html=`<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333">
-      <div class="fin-stat"><div class="fin-stat-num">${fmt(ytdRevenue)}</div><div class="fin-stat-label">YTD Revenue</div></div>
-      <div class="fin-stat"><div class="fin-stat-num">${fmt(ytdGoal)}</div><div class="fin-stat-label">YTD Goal</div></div>
-      <div class="fin-stat"><div class="fin-stat-num" style="color:${ytdPct>=100?'#27ae60':ytdPct>=75?'#e67e22':'#c0392b'}">${ytdPct}%</div><div class="fin-stat-label">Of YTD Goal</div></div>
-      <div class="fin-stat"><div class="fin-stat-num">${fmt(annualPace)}</div><div class="fin-stat-label">Annual Pace</div></div>
+    // 2025 comparison: pulled live from QBO (JobTread has no real 2025 data for this org — JT adopted in 2026)
+    const py=new Date().getFullYear()-1;
+    let priorYtdRevenue=null,priorFullYearRevenue=null,yoyPct=null;
+    try{
+      const qboPriorRes=await fetch(`https://ootwdashboard.synology.me:8888/qbo-data?year=${py}`,{headers:{'X-Dashboard-Key':'fb71o0mugMZMzBLtzet76Q7Wh1UBVSki1iFRLRal'}});
+      if(qboPriorRes.ok){
+        const qboPriorData=await qboPriorRes.json();
+        const priorMonths=qboPriorData.months.map(m=>m.income||0);
+        priorYtdRevenue=priorMonths.slice(0,cm+1).reduce((s,v)=>s+v,0);
+        priorFullYearRevenue=priorMonths.reduce((s,v)=>s+v,0);
+        yoyPct=priorYtdRevenue>0?Math.round(((ytdRevenue-priorYtdRevenue)/priorYtdRevenue)*100):null;
+      }
+    }catch(e){console.warn('Prior year QBO fetch failed:',e);}
+    const yoyColor=yoyPct===null?'#a3a3a3':yoyPct>=0?'#27ae60':'#c0392b';
+
+    let html=`<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:14px;border-bottom:1px solid #333">
+      <div class="fin-stat" style="flex:1 1 300px;min-width:280px">
+        <div class="fin-stat-num">${fmt(ytdRevenue)}</div>
+        <div class="fin-stat-label">YTD Revenue</div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:8px">
+          <div style="width:46px;font-size:13px;color:#c2c2c2;text-align:right;flex-shrink:0">Revenue</div>
+          <div style="flex:1;height:14px;background:#2a2a2a;border-radius:3px;overflow:hidden"><div style="height:100%;width:${revBarPct}%;background:${barColor};border-radius:3px"></div></div>
+          <div style="width:76px;font-size:12px;color:#eeeeee;text-align:right;flex-shrink:0">${fmt(ytdRevenue)}</div>
+        </div>
+        <div style="margin-top:5px;display:flex;align-items:center;gap:8px">
+          <div style="width:46px;font-size:13px;color:#c2c2c2;text-align:right;flex-shrink:0">Goal</div>
+          <div style="flex:1;height:14px;background:#2a2a2a;border-radius:3px;overflow:hidden"><div style="height:100%;width:${goalBarPct}%;background:#666;border-radius:3px"></div></div>
+          <div style="width:76px;font-size:12px;color:#eeeeee;text-align:right;flex-shrink:0">${fmt(ytdGoal)}</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:${varianceAhead?'#27ae60':'#c0392b'}">${varianceAhead?'+':'-'}${fmt(Math.abs(variance))} — at ${ytdPct}% of YTD Goal</div>
+      </div>
+      <div class="fin-stat">
+        <div class="fin-stat-num">${fmt(projectedWithPipeline)}</div>
+        <div class="fin-stat-label">Projected Year-End (Pace + Pipeline)</div>
+        <div style="font-size:13px;color:#a3a3a3;margin-top:6px;max-width:170px;line-height:1.3">YTD pace &times; 12 (${fmt(annualPace)}) plus ${fmt(pipelineTotal)} in signed pipeline</div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:${projPct>=100?'#27ae60':projPct>=75?'#e67e22':'#c0392b'}">at ${projPct}% of Annual Goal</div>
+      </div>
       <div class="fin-stat"><div class="fin-stat-num">${fmt(REVENUE_GOAL_MONTHLY*12)}</div><div class="fin-stat-label">Annual Goal</div></div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #333">
+      ${priorYtdRevenue===null?`
+      <div style="flex:1;min-width:280px;background:#1c1c1c;border-radius:6px;padding:12px 14px">
+        <div style="font-size:11px;color:#a3a3a3;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">2025 Comparison</div>
+        <div style="font-size:13px;color:#a3a3a3;line-height:1.5">Couldn't reach the QBO data source this load — showing without a 2025 comparison for now.</div>
+      </div>`:`
+      <div style="flex:1;min-width:220px;background:#1c1c1c;border-radius:6px;padding:12px 14px">
+        <div style="font-size:11px;color:#a3a3a3;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">${py} YTD (same # of months, via QBO)</div>
+        <div style="font-size:20px;font-weight:700;color:#eeeeee">${fmt(priorYtdRevenue)}</div>
+      </div>
+      <div style="flex:1;min-width:220px;background:#1c1c1c;border-radius:6px;padding:12px 14px">
+        <div style="font-size:11px;color:#a3a3a3;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">${new Date().getFullYear()} YTD vs. ${py} YTD</div>
+        <div style="font-size:20px;font-weight:700;color:${yoyColor}">${yoyPct===null?'n/a':(yoyPct>=0?'+':'')+yoyPct+'%'}</div>
+      </div>
+      <div style="flex:1;min-width:220px;background:#1c1c1c;border-radius:6px;padding:12px 14px">
+        <div style="font-size:11px;color:#a3a3a3;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">${py} Full Year Actual (via QBO)</div>
+        <div style="font-size:20px;font-weight:700;color:#eeeeee">${fmt(priorFullYearRevenue)}</div>
+      </div>`}
     </div>`;
 
     html+=`<div style="display:flex;gap:8px;padding:0 16px">
       <div style="width:44px;flex-shrink:0;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:4px;padding-bottom:18px">
-        <span style="font-size:9px;color:#999">${fmt(Math.round(maxBar/1000)*1000)}</span>
-        <span style="font-size:9px;color:#e67e22">${fmt(REVENUE_GOAL_MONTHLY)}</span>
-        <span style="font-size:9px;color:#999">$0</span>
+        <span style="font-size:13px;color:#c2c2c2">${fmt(Math.round(maxBar/1000)*1000)}</span>
+        <span style="font-size:13px;color:#e67e22">${fmt(REVENUE_GOAL_MONTHLY)}</span>
+        <span style="font-size:13px;color:#c2c2c2">$0</span>
       </div>
       <div style="flex:1;position:relative">
         <div style="position:absolute;left:0;right:0;top:${goalY}%;height:1px;background:#e67e22;opacity:0.8;z-index:2;pointer-events:none"></div>
@@ -813,13 +1001,13 @@ async function loadRevenueGoal() {
             const barH=Math.max((v/maxBar)*chartH,2);
             const barColor=v>=REVENUE_GOAL_MONTHLY?'#27ae60':v>=(REVENUE_GOAL_MONTHLY*0.75)?'#e67e22':'#c0392b';
             return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0">
-              <span style="font-size:8px;color:#ccc;margin-bottom:1px;white-space:nowrap;overflow:hidden;max-width:100%;text-align:center">${fmt(v)}</span>
+              <span style="font-size:13px;color:#e0e0e0;margin-bottom:1px;white-space:nowrap;overflow:hidden;max-width:100%;text-align:center">${fmt(v)}</span>
               <div style="width:100%;background:${barColor};height:${barH}px;border-radius:2px 2px 0 0"></div>
             </div>`;
           }).join('')}
         </div>
         <div style="display:flex;gap:3px;margin-top:3px">
-          ${months.slice(0,cm+1).map(m=>`<div style="flex:1;text-align:center;font-size:9px;color:#bbb;min-width:0">${m}</div>`).join('')}
+          ${months.slice(0,cm+1).map(m=>`<div style="flex:1;text-align:center;font-size:13px;color:#d5d5d5;min-width:0">${m}</div>`).join('')}
         </div>
       </div>
     </div>`;
@@ -829,64 +1017,6 @@ async function loadRevenueGoal() {
   } catch(e){document.getElementById('s-revgoal').textContent=`Error: ${e.message}`;}
 }
 
- // ─── AVG JOB SIZE ────────────────────────────────────────────────────────────
-async function loadJobSize() {
-  try {
-    const thisYear = new Date().getFullYear();
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const cm = new Date().getMonth();
-
-    const res = await query({organization:{$:{id:ORG_ID},jobs:{$:{size:100},nodes:{id:{},projectedPrice:{},customFieldValues:{$:{size:5},nodes:{customField:{id:{}},value:{}}}}}}});
-    const jobs = res.organization.jobs.nodes.filter(j => j.id !== INTERNAL_JOB);
-
-    // Filter to won jobs this year with a valid projectedPrice > 5000
-    const wonByMonth = Array(12).fill(null).map(() => []);
-    jobs.forEach(job => {
-      const status = job.customFieldValues?.nodes?.find(c => c.customField?.id === STATUS_CF)?.value;
-      if (!WON_STATUSES.has(status)) return;
-      const outcome = job.customFieldValues?.nodes?.find(c => c.customField?.id === OUTCOME_DATE_CF)?.value;
-      if (!outcome) return;
-      const dt = new Date(outcome);
-      if (dt.getFullYear() !== thisYear) return;
-      const price = job.projectedPrice || 0;
-      if (price < 5000) return; // exclude tiny/warranty jobs
-      wonByMonth[dt.getMonth()].push(price);
-    });
-
-    // Overall avg
-    const allPrices = wonByMonth.flat();
-    const avgOverall = allPrices.length > 0 ? Math.round(allPrices.reduce((s,v) => s+v, 0) / allPrices.length) : 0;
-    const jobCount = allPrices.length;
-
-    // Monthly trend
-    let trendHtml = '';
-    for (let i = 0; i <= cm; i++) {
-      const prices = wonByMonth[i];
-      if (prices.length === 0) {
-        trendHtml += `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #2a2a2a;font-size:10px"><span style="color:#555">${months[i]}</span><span style="color:#555">—</span></div>`;
-      } else {
-        const avg = Math.round(prices.reduce((s,v) => s+v, 0) / prices.length);
-        trendHtml += `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #2a2a2a;font-size:10px">
-          <span style="color:#bbb">${months[i]}</span>
-          <span style="color:#ddd">${fmt(avg)}</span>
-          <span style="color:#555;font-size:9px">${prices.length} job${prices.length !== 1 ? 's' : ''}</span>
-        </div>`;
-      }
-    }
-
-    const html = `<div style="margin-top:12px;padding-top:10px;border-top:1px solid #2a2a2a">
-      <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:#ccc;text-transform:uppercase;margin-bottom:8px">Avg Job Size</div>
-      <div style="font-size:28px;font-weight:700;color:#fff;line-height:1">${fmt(avgOverall)}</div>
-      <div style="font-size:10px;color:#bbb;margin-bottom:10px">${jobCount} won job${jobCount !== 1 ? 's' : ''} YTD</div>
-      ${trendHtml}
-    </div>`;
-
-    document.getElementById('avg-jobsize-area').innerHTML = html;
-  } catch(e) { console.warn('loadJobSize error:', e); }
-}
-
- 
- 
  // ─── BACKLOG ─────────────────────────────────────────────────────────────────
 async function loadBacklog() {
   try {
@@ -900,32 +1030,40 @@ async function loadBacklog() {
 
     document.getElementById('backlog-area').innerHTML = `
       <div style="font-size:36px;font-weight:700;color:#27ae60;line-height:1;margin-bottom:4px">${fmt(total)}</div>
-      <div style="font-size:10px;color:#bbb;margin-bottom:14px">Total Committed Backlog</div>
+      <div style="font-size:12px;color:#d5d5d5;margin-bottom:14px">Total Committed Backlog</div>
       <div style="display:flex;flex-direction:column;gap:6px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0;border-bottom:1px solid #2a2a2a">
-          <span style="color:#ccc">Closing Pipeline</span>
-          <span style="color:#ddd">${fmt(closing)}</span>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #2a2a2a">
+          <span style="color:#e0e0e0">Closing Pipeline</span>
+          <span style="color:#eeeeee">${fmt(closing)}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 0">
-          <span style="color:#ccc">Unbilled (In Production)</span>
-          <span style="color:#ddd">${fmt(unbilled)}</span>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0">
+          <span style="color:#e0e0e0">Unbilled (In Production)</span>
+          <span style="color:#eeeeee">${fmt(unbilled)}</span>
         </div>
       </div>`;
   } catch(e) { console.warn('loadBacklog error:', e); }
 }
+
 async function loadAll() {
   document.getElementById('last-updated').textContent='Refreshing...';
   await Promise.all([loadPipeline(), loadGP()]);
   await loadLabor();
   await loadFinancial();
   await loadClosingPipeline();
-  await loadJobSize();
   await loadRevenueGoal();
   await loadBacklog();
+  await loadBusinessModel();
   document.getElementById('last-updated').textContent=`Updated ${new Date().toLocaleTimeString()}`;
 }
  window.addEventListener('DOMContentLoaded', loadAll);
 setInterval(loadAll, 60*60*1000);
 </script>
+<div style="height:16px"></div>
+<div class="grid grid-1">
+  <div class="card">
+    <div class="card-head"><h2>Business Model Health Check</h2><span class="status" id="s-bizmodel"></span></div>
+    <div id="bizmodel-area"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+</div>
 </body>
 </html>
