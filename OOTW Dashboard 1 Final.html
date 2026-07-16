@@ -166,6 +166,14 @@ loadClosingPipeline()<!DOCTYPE html>
       </div>
     </div>
   </div>
+
+  <div style="height:16px"></div>
+  <div class="grid grid-1">
+    <div class="card">
+      <div class="card-head"><h2>GP% by Job — Completed</h2><span class="status" id="s-gp-completed"></span></div>
+      <div id="gp-table-completed"><div class="loading"><span class="spinner"></span></div></div>
+    </div>
+  </div>
 </div>
 
 <div class="spacer"></div>
@@ -425,7 +433,7 @@ async function loadGP() {
 
     // YTD GP% — Job Complete jobs with outcome date in current year, non-warranty, with price
     const thisYear=new Date().getFullYear();
-    const ytdMargins=allJobs.filter(j=>{
+    const completedJobs=allJobs.filter(j=>{
       const cfv=j.customFieldValues?.nodes||[];
       const status=cfv.find(c=>c.customField?.id===STATUS_CF)?.value;
       const outcome=cfv.find(c=>c.customField?.id===OUTCOME_DATE_CF)?.value;
@@ -434,9 +442,16 @@ async function loadGP() {
       const EXCLUDE_FROM_YTD = new Set(['22PM5BcPa9PR']); // Bosch C Windows - carpenter quit
       return status==='Job Complete' && outcome && new Date(outcome).getFullYear()===thisYear && !EXCLUDE_FROM_YTD.has(j.id)
         && j.projectedPrice>=5000 && j.actualCost!=null && !name.includes('warranty') && !rTypes.includes('warranty');
-    }).map(j=>(j.projectedPrice-j.actualCost)/j.projectedPrice*100);
+    });
+    const ytdMargins=completedJobs.map(j=>(j.projectedPrice-j.actualCost)/j.projectedPrice*100);
     const avgYTD=ytdMargins.length>0?ytdMargins.reduce((a,b)=>a+b,0)/ytdMargins.length:null;
     for(const job of jobs){
+      const r=await query({job:{$:{id:job.id},documents:{$:{size:20,where:{and:[{'=':[{field:['type']},{value:'customerOrder'}]},{'=':[{field:['status']},{value:'approved'}]},{'=':[{field:['includeInBudget']},{value:true}]}]}},nodes:{cost:{},price:{}}}}});
+      const orders=r.job.documents?.nodes||[];
+      job.bPrice=orders.reduce((s,o)=>s+(o.price||0),0);
+      job.bCost=orders.reduce((s,o)=>s+(o.cost||0),0);
+    }
+    for(const job of completedJobs){
       const r=await query({job:{$:{id:job.id},documents:{$:{size:20,where:{and:[{'=':[{field:['type']},{value:'customerOrder'}]},{'=':[{field:['status']},{value:'approved'}]},{'=':[{field:['includeInBudget']},{value:true}]}]}},nodes:{cost:{},price:{}}}}});
       const orders=r.job.documents?.nodes||[];
       job.bPrice=orders.reduce((s,o)=>s+(o.price||0),0);
@@ -476,6 +491,34 @@ async function loadGP() {
     const ytdEl=document.getElementById('avg-gp-ytd');
     ytdEl.textContent=avgYTD!==null?fmtP(avgYTD):'—';
     ytdEl.style.color=avgYTD>=35?'#27ae60':avgYTD>=25?'#e67e22':'#c0392b';
+
+    // Completed jobs table — same layout, but Final GP% uses actual cost since the job is done
+    completedJobs.sort((a,b)=>{
+      const mA=a.projectedPrice?(a.projectedPrice-a.actualCost)/a.projectedPrice*100:999;
+      const mB=b.projectedPrice?(b.projectedPrice-b.actualCost)/b.projectedPrice*100:999;
+      return mA-mB;
+    });
+    let htmlC=`<table><thead><tr><th>Job</th><th>Contract</th><th>Budgeted GP%</th><th>Final GP%</th><th>Variance</th><th>Margin</th></tr></thead><tbody>`;
+    completedJobs.forEach(job=>{
+      const name=job.location?.account?.name||job.name;
+      const price=job.projectedPrice,cost=job.actualCost;
+      const finalM=price&&cost!=null?(price-cost)/price*100:null;
+      const budgM=job.bPrice>0?(job.bPrice-job.bCost)/job.bPrice*100:null;
+      const variance=budgM!==null&&finalM!==null?finalM-budgM:null;
+      const barPct=budgM>0&&finalM!==null?Math.min(100,Math.max(0,(finalM/budgM)*100)):0;
+      const col=barColor(variance);
+      htmlC+=`<tr>
+        <td>${name}</td>
+        <td class="c-neutral">${fmt(price)}</td>
+        <td class="c-neutral">${fmtP(budgM)}</td>
+        <td class="${varClass(variance)}">${fmtP(finalM)}</td>
+        <td class="${variance!==null?(variance>=0?'c-green':'c-red'):'c-neutral'}">${variance!==null?fmtP(variance):'—'}</td>
+        <td style="width:100px"><div style="width:80px;background:#333;border-radius:99px;height:8px;overflow:hidden;margin-left:auto"><div style="width:${barPct}%;height:8px;border-radius:99px;background:${col}"></div></div></td>
+      </tr>`;
+    });
+    htmlC+='</tbody></table>';
+    document.getElementById('gp-table-completed').innerHTML=htmlC;
+    document.getElementById('s-gp-completed').textContent=`${completedJobs.length} jobs`;
 
     document.getElementById('s-gp').textContent=`${jobs.length} jobs`;
   } catch(e){document.getElementById('s-gp').textContent=`Error: ${e.message}`;}
